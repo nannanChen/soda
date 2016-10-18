@@ -16,7 +16,7 @@ public class CenterData implements Serializable {
 	public static Map<String,String> centerDataMap=new HashMap<String,String>();
 
 	 static {
-	        centerDataMap.put("0","其它");
+	        centerDataMap.put("0","普通人");
 	        centerDataMap.put("1","购物达人");
 	        centerDataMap.put("2","交际达人");
 	        centerDataMap.put("3","游戏达人");

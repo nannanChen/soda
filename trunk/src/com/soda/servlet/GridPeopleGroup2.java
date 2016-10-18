@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,14 +61,13 @@ public class GridPeopleGroup2 extends HttpServlet {
 		ResultSet resultSet=null;
 		try{
 			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT * FROM `grid_people_group1` WHERE grid_people_group_id=?");
-	        pstmt.setString(1, groupId);
+	        pstmt = connection.prepareStatement("SELECT SUM(COUNT) AS count,type,GROUP_CONCAT(grid_people_group_id) AS grid_people_group_id FROM `grid_people_group1` WHERE grid_people_group_id "+queryWhereInByGroupId(groupId.split(","))+" GROUP BY TYPE");
 	        resultSet = pstmt.executeQuery();
 	        json.put("status", "OK");
         	JSONArray dataList=new JSONArray();
 	        while(resultSet.next()){
 	    		JSONObject data=new JSONObject();
-	    		data.put("grid_people_group_id",resultSet.getString("grid_people_group_id"));
+	    		data.put("grid_people_group_id",groupId);
 	    		data.put("type",CenterData.centerDataMap.get(resultSet.getString("type")));
 	        	data.put("count",resultSet.getString("count"));
 	        	dataList.put(data);
@@ -82,6 +82,20 @@ public class GridPeopleGroup2 extends HttpServlet {
 			release(connection,pstmt,resultSet);
 		}
 		return json;
+	}
+	
+	
+	public String queryWhereInByGroupId(String[] groupIds){
+		StringBuffer in=new StringBuffer("IN(");
+		for(int i=0;i<groupIds.length;i++){
+			if(i==groupIds.length-1){
+				in.append("'"+groupIds[i]+"')");
+			}else{
+				in.append("'"+groupIds[i]+"',");
+			}
+		}
+		System.out.println(new Date()+" queryWhereInByGroupId in="+in.toString());
+		return in.toString();
 	}
 	
 	
