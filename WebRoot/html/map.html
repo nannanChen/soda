@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>人流量地图</title>
+    <link rel="stylesheet" href="../rangeCss/jquery.range.css">
+    <style>
+        #svgMap{
+            background: #141414;
+            display: inline-block;
+        }
+        #bar{
+            display: none;
+        }
+        #pie{
+            display: inline-block;
+        }
+        #tooltip {
+            position: absolute;
+            width: 180px;
+            height: auto;
+            padding: 10px;
+            background-color: #F08080;
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            border-radius: 10px;
+            -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+            -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+        }
+        #tooltip.hidden {
+            display: none;
+        }
+        #tooltip p {
+            margin: 0;
+            font-family: sans-serif;
+            font-size: 16px;
+            line-height: 20px;
+        }
+        .main{
+            position: absolute;
+            top: 10%;
+            right: 10%;
+        }
+        .realCurve,.staticGrid{
+            cursor: pointer;
+        }
+        button#submit {
+            position: absolute;
+            right: -59px;
+            margin-top: -10px;
+            padding: 3px 9px;
+            color: white;
+            background: #3398db;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            /* float: right; */
+            /* margin-left: 158%; */
+        }
+        #arrow0{
+            fill: #ffafaf;
+        }
+        #arrow1{
+            fill: #ff5454;
+        }
+        #arrow2{
+            fill: #ffa030;
+        }
+        #arrow3{
+            fill: #ffe6af;
+        }
+        #arrow4{
+            fill: #ffea00;
+        } #arrow5{
+            fill: #ff6c00;
+        } #arrow6{
+            fill: #05ff28;
+        } #arrow7{
+            fill: #4dfff9;
+        } #arrow8{
+            fill: #2e8217;
+        } #arrow9{
+            fill: #f54fff;
+        } #arrow10{
+            fill: #2263d9;
+        } #arrow11{
+            fill: #9c00ff;
+        } #arrow12{
+            fill: #8d0000;
+        } #arrow13{
+            fill: #8f00a4;
+        } #arrow14{
+            fill: #e5ff6b;
+        } #arrow15{
+            fill: #6d3e2c;
+        } #arrow16{
+            fill: #18d091;
+        } #arrow17{
+            fill: #0011ea;
+        } #arrow18{
+            fill: #0a5d6f;
+        } #arrow19{
+            fill: #828b20;
+        } #arrow20{
+            fill: #ff7f94;
+        } #arrow21{
+            fill: #ff2828;
+        }#arrow22{
+            fill: #4000aa;
+        }#arrow23{
+            fill: #96671d;
+        }
+        .block{
+            width: 20px;
+            height: 20px;
+            color: white;
+            text-align: center;
+            display: inline-block;
+        }
+        .block0{
+            background: #ffafaf;
+        }
+        .block1{
+            background: #ff5454;
+        }
+        .block2{
+            background: #ffa030;
+        }
+        .block3{
+            background: #ffe6af;
+        }
+        .block4{
+            background: #ffea00;
+        }
+        .block5{
+            background: #ff6c00;
+        }
+        .block6{
+            background: #05ff28;
+        }
+        .block7{
+            background: #4dfff9;
+        }
+        .block8{
+            background: #2e8217;
+        }
+        .block9{
+            background: #f54fff;
+        }
+        .block10{
+            background: #2263d9;
+        }
+        .block11{
+            background: #9c00ff;
+        }
+        .block12{
+            background: #8d0000;
+        }
+        .block13{
+            background: #8f00a4;
+        }
+        .block14{
+            background: #e5ff6b;
+        }
+        .block15{
+            background: #6d3e2c;
+        }
+        .block16{
+            background: #18d091;
+        }
+        .block17{
+            background: #0011ea;
+        }
+        .block18{
+            background: #0a5d6f;
+        }
+        .block19{
+            background: #828b20;
+        }
+        .block20{
+            background: #ff7f94;
+        }
+        .block21{
+            background: #ff2828;
+        }
+        .block22{
+            background: #4000aa;
+        }
+        .block23{
+            background: #96671d;
+        }
+    </style>
+</head>
+<body>
+<div id="tooltip" class="hidden" style="left: 578.887px; top: 326.96px;">
+    <p><strong>经度：</strong><span id="x">江苏省</span></p>
+    <p><strong>纬度：</strong><span id="y">2004</span></p>
+    <p><strong>名称：</strong><span id="name">15003.6</span></p>
+</div>
+<svg id="svgMap"></svg>
+<div id="pie" style="width: 400px;height:400px;"></div>
+<div id="bar" style="width: 400px;height:400px;"></div>
+<div class="main">
+<div class="chooseTime">
+    <div>
+        <p>请选择时间段</p>
+        <input type="text" class="timePoint"/>
+        <button id="submit">确定</button>
+        <p style="margin-top: 30px">请选择日期</p>
+        <input type="date" id="datePicker" onchange="chooseDate()">
+        <p>请选择达人类型</p>
+        <div class="select">
+            <select name="" id="selectType">
+                <option value=""></option>
+                <option value="1">购物达人</option>
+                <option value="2">交际达人</option>
+                <option value="3">游戏达人</option>
+                <option value="4">时政达人</option>
+                <option value="5">文娱达人</option>
+                <option value="6">IT达人</option>
+                <option value="7">健身达人</option>
+                <option value="8">旅游达人</option>
+                <option value="9">金融达人</option>
+                <option value="0">其它</option>
+            </select>
+        </div>
+        <div style="margin-top: 30px">
+        <div class="block block0">
+            0
+        </div>
+        <div class="block block1">
+           1
+        </div>
+        <div class="block block2">
+            2
+        </div>
+        <div class="block block3">
+            3
+        </div>
+        <div class="block block4">
+            4
+        </div>
+        <div class="block block5">
+           5
+        </div>
+        <div class="block block6">
+            6
+        </div>
+        <div class="block block7">
+            7
+        </div>
+        <div class="block block8">
+            8
+        </div>
+        <div class="block block9">
+            9
+        </div>
+        <div class="block block10">
+            10
+        </div>
+        <div class="block block11">
+            11
+        </div>
+        <div class="block block12">
+            12
+        </div>
+        <div class="block block13">
+            13
+        </div>
+        <div class="block block14">
+            14
+        </div> <div class="block block15">
+            15
+        </div> <div class="block block16">
+            16
+        </div> <div class="block block17">
+            17
+        </div> <div class="block block18">
+            18
+        </div> <div class="block block19">
+            19
+        </div> <div class="block block20">
+            20
+        </div> <div class="block block21">
+            21
+        </div>
+        <div class="block block22">
+            22
+        </div>
+        <div class="block block23">
+            23
+        </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<script src="../jquery/jquery-3.1.0.min.js" type="text/javascript"></script>
+<script src="../echart/echarts.min.js" type="text/javascript"></script>
+<script src="../rangeCss/jquery.range.js"></script>
+<script src="../js/d3.min.js" type="text/javascript"></script>
+<script src="../js/drawMap.js"></script>
+</body>
+</html>
