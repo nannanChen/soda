@@ -62,7 +62,27 @@ $(document).ready(function() {
         isRange : true
     });
 
-    document.getElementById('datePicker').valueAsDate = new Date("2016-03-01");
+    $("#datePicker").AnyPicker(
+        {
+            mode: "datetime",
+            dateTimeFormat: "yyyy-MM-dd",
+            minValue: new Date(2016, 02, 01),
+            maxValue: new Date(2016, 03, 30),
+            onSetOutput: function(sOutput, oSelectedValues)
+            {
+                var date_input =  document.getElementById('datePicker').value;
+                    DATE_LAYOUT_STATIC_GRID = date_input.split("-")[0]+date_input.split("-")[1]+date_input.split("-")[2];
+                    var typeVal = $("#selectType").find("option:selected").val();
+                    if(typeVal!=""){
+                        getStaticGridUrl = "/soda-web/getClassLineServlet?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea+"&classType="+typeVal;
+                    }else {
+                        getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
+                    }
+                    drawPointOrLine()
+            }
+        });
+
+    document.getElementById('datePicker').value = "2016-03-01";
     //document.getElementById('dateStaticGrid').valueAsDate = new Date();
 
     //$("#iframe").attr("src","bar.html?dataset="+circleDataArr[0][0].dataset+"&labelText="+circleDataArr[0][0].labelText+"&name="+circleDataArr[0][0].name)
@@ -297,20 +317,6 @@ var echart ={
 //    realCurveArrs = [];
 //    //getData.getRealData()
 //}
-
-function chooseDate(){
-    var date_input =  document.getElementById('datePicker').value;
-    DATE_LAYOUT_STATIC_GRID = date_input.split("-")[0]+date_input.split("-")[1]+date_input.split("-")[2];
-    var typeVal = $("#selectType").find("option:selected").val();
-    if(typeVal!=""){
-        getStaticGridUrl = "/soda-web/getClassLineServlet?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea+"&classType="+typeVal;
-    }else {
-        getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
-    }
-    drawPointOrLine()
-}
-
-
     drawTipsLine();
     function drawTipsLine(){
         appendSvg.selectAll(".rect").data(circleDataArr).enter()
@@ -894,6 +900,35 @@ function drawStatusPoint(root){
             echart.bar(dataX,dataY)
         }
     })
+        })
+        .on("mouseover",function(d,i){
+            var y = d3.select(this).attr("cy");
+            var r = d3.select(this).attr("r");
+            var x = d3.select(this).attr("cx") * 1 + 1 * r;
+            x = parseFloat(x)-220;
+            y = parseFloat(y)+20;
+            var tooltip = d3.select("#tooltip")
+                .style("left", x + "px")
+                .style("top", y + "px")
+                .style("display","block");
+            $.ajax({
+                url:"/soda-web/getGridPeopleGroup2?groupId="+ d.grid_people_group_id,
+                type:"get",
+                dataType:"json",
+                async: false,
+                success:function(data){
+                   var count = 0;
+                    for(var i=0;i<data.dataList.length;i++){
+                        count+=parseFloat(data.dataList[i].count);
+                    }
+                    tooltip.select("#total_p").text(count);
+                }
+            })
+
+        })
+        .on("mouseout",function(d,i){
+            var tooltip = d3.select("#tooltip")
+                .style("display","none")
         });
     staticGridExitCircle.remove();
     }
