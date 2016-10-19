@@ -230,11 +230,32 @@ public class GridFromToNum2 extends HttpServlet {
 	        while(resultSet.next()){
 	    		JSONObject data=new JSONObject();
 	    		data.put("date",resultSet.getString("DATE"));
-	    		data.put("hour",resultSet.getString("HOUR"));
-	    		Point point=GridDivide.indexMap.get(resultSet.getString("FROM_INDEX"));
+	    		
+	    		int hour=resultSet.getInt("HOUR");
+	    		data.put("hour",hour);
+	    		
+	    		String from_index=resultSet.getString("FROM_INDEX");
+	    		Point point=GridDivide.indexMap.get(from_index);
 	        	data.put("longitude",point.x);
 	        	data.put("latitude",point.y);
-	        	data.put("count",resultSet.getString("COUNT"));
+	        	
+	        	int count=resultSet.getInt("COUNT");
+	        	data.put("count",count);
+	        	
+//	        	data.put("from_index",from_index);
+
+	        	Map<String,Integer> warnAverage=(Map<String,Integer>)this.getServletContext().getAttribute("warn_Average");
+	    		int avg=warnAverage.get(from_index+"_"+hour);
+	        	if(avg<10000){
+		        	data.put("warn",false);
+	        	}else{
+	        		if(count>avg*1.1){
+			        	data.put("warn",true);
+	        		}else{
+	        			data.put("warn",false);
+	        		}
+	        	}
+	        	
 	        	data.put("grid_people_group_id",resultSet.getString("grid_people_group_id"));
 	        	dataList.put(data);
 	        }

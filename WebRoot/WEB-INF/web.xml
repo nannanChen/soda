@@ -24,7 +24,9 @@
   </servlet>
 
 
-
+<listener>
+	<listener-class>com.soda.listener.CacheInitListener</listener-class>
+</listener>
 
 
   <servlet-mapping>
