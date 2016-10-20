@@ -22,12 +22,22 @@
     <servlet-name>ClassLineServlet</servlet-name>
     <servlet-class>com.soda.servlet.ClassLineServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>PredictServlet</servlet-name>
+    <servlet-class>com.soda.servlet.PredictDataServlet</servlet-class>
+  </servlet>
 
 
 <listener>
 	<listener-class>com.soda.listener.CacheInitListener</listener-class>
 </listener>
 
+
+<!-- 预测数据 -->
+<servlet-mapping>
+	<servlet-name>PredictServlet</servlet-name>
+	<url-pattern>/getPredictServlet</url-pattern>
+</servlet-mapping>
 
   <servlet-mapping>
   	<!-- 画网格点 -->
@@ -62,6 +72,10 @@
   	<!--获取一类人的行动轨迹  -->
     <servlet-name>ClassLineServlet</servlet-name>
     <url-pattern>/getClassLineServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>PredictServlet</servlet-name>
+    <url-pattern>/servlet/PredictServlet</url-pattern>
   </servlet-mapping>
   
   
