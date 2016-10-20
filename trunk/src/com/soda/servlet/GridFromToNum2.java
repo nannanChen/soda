@@ -93,7 +93,7 @@ public class GridFromToNum2 extends HttpServlet {
 		ResultSet resultSet=null;
 		try{
 			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT SUM(COUNT) AS NUM FROM `grid_from_to_num1` WHERE DATE=? AND HOUR "+queryWhereInByHour(fromH,toH));
+	        pstmt = connection.prepareStatement("SELECT SUM(COUNT) AS NUM FROM `grid_from_to_num1` WHERE DATE=? AND COUNT>1000 AND HOUR "+queryWhereInByHour(fromH,toH));
 	        pstmt.setString(1, date);
 	        resultSet = pstmt.executeQuery();
         	JSONArray graphData=new JSONArray();
@@ -148,7 +148,7 @@ public class GridFromToNum2 extends HttpServlet {
 		ResultSet resultSet=null;
 		try{
 			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT * FROM `grid_from_to_num1` WHERE DATE=? AND HOUR=? AND COUNT>500 AND to_index!=(-1) AND to_index!=from_index AND to_index "+queryWhereInByIndex(gridIndexs));
+	        pstmt = connection.prepareStatement("SELECT * FROM `grid_from_to_num1` WHERE DATE=? AND HOUR=? AND COUNT>1000 AND to_index!=(-1) AND to_index!=from_index AND to_index "+queryWhereInByIndex(gridIndexs));
 	        pstmt.setString(1, date);
 	        pstmt.setInt(2, currentHour);
 	        resultSet = pstmt.executeQuery();
@@ -225,7 +225,7 @@ public class GridFromToNum2 extends HttpServlet {
 		ResultSet resultSet=null;
 		try{
 			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT DATE,HOUR,FROM_INDEX,SUM(COUNT) AS COUNT,GROUP_CONCAT(grid_people_group_id) AS grid_people_group_id FROM `grid_from_to_num1` WHERE DATE=? AND HOUR=? AND COUNT>500 GROUP BY FROM_INDEX");
+	        pstmt = connection.prepareStatement("SELECT DATE,HOUR,FROM_INDEX,SUM(COUNT) AS COUNT,GROUP_CONCAT(grid_people_group_id) AS grid_people_group_id FROM `grid_from_to_num1` WHERE DATE=? AND HOUR=? AND COUNT>1000 GROUP BY FROM_INDEX");
 	        pstmt.setString(1, date);
 	        pstmt.setInt(2, fromH);
 	        resultSet = pstmt.executeQuery();
