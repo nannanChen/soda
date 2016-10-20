@@ -41,10 +41,10 @@
             top: 10%;
             right: 10%;
         }
-        .realCurve,.staticGrid{
+        .realCurve,.staticGrid,.rectStatic,.rect{
             cursor: pointer;
         }
-        button#submit {
+        button.btn {
             position: absolute;
             right: -59px;
             margin-top: -10px;
@@ -196,14 +196,14 @@
    <p class="total_p">总人数：<span id="total_p"></span>人</p>
 </div>
 <svg id="svgMap"></svg>
-<div id="pie" style="width: 400px;height:400px;"></div>
+<div id="pie" style="width: 450px;height:400px;"></div>
 <div id="bar" style="width: 400px;height:400px;"></div>
 <div class="main">
 <div class="chooseTime">
     <div>
         <p>请选择时间段</p>
         <input type="text" class="timePoint"/>
-        <button id="submit">确定</button>
+        <button id="submit" class="btn">确定</button>
         <p style="margin-top: 30px">请选择日期</p>
         <input type="text" id="datePicker">
         <p>请选择达人类型</p>
@@ -219,7 +219,7 @@
                 <option value="7">健身达人</option>
                 <option value="8">旅游达人</option>
                 <option value="9">金融达人</option>
-                <option value="0">其它</option>
+                <option value="0">普通人</option>
             </select>
         </div>
         <div style="margin-top: 30px">
@@ -288,6 +288,16 @@
         <div class="block block23">
             23
         </div>
+        </div>
+        <p>请选择预测时间段</p>
+        <input type="text" class="hour_predict"/>
+        <button id="submit_predict" class="btn">确定</button>
+        <p style="margin-top: 30px">请选择预测日期</p>
+        <input type="text" id="date_predict">
+        <br>
+        <br>
+        <div class="predict_people_count">
+            南京东路在20160401的14点预测人数为15524人
         </div>
     </div>
 </div>

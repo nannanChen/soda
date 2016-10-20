@@ -6,16 +6,15 @@ var realCurveArrs = [];//实际线
 
 var circleDataArr = [
     [{longitude:121.490468 ,latitude:31.233705450000002,name:"南京东路",color:"rgba(255,108,0,0.5)"}],
-    [{longitude:121.45144272 ,latitude:31.19895475,name:"徐家汇",color:"rgba(5,255,40,0.5)"}],
+    [{longitude:121.45144272 ,latitude:31.19895475,name:"徐家汇",color:"rgba(96,96,99,0.5)"}],
     [{longitude:121.37339216,latitude:31.12945335,name:"莘庄",color:"rgba(156,0,255,0.5)"}]
 ];
 
 var width  = $(window).width()*0.5;
 var height = $(window).height();
-var TYPEURL = "";
 var appendSvg = d3.select("#svgMap")
     .attr("width", width)
-    .attr("height", height)
+    .attr("height", height);
 //    地图放大缩小函数
 var zoom = d3.behavior.zoom()
     .scaleExtent([1, 100])
@@ -47,11 +46,17 @@ var getCoordinate=function(longitude, latitude){
     }
 };
 $(document).ready(function() {
-    //getData.Init();
-    //var data =  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    //echart.pie();
-    //echart.bar(data);
     $('.timePoint').jRange({
+        from:0,
+        to: 23,
+        step: 1,
+        scale: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+        format: '%s',
+        width: 400,
+        showLabels: true,
+        isRange : true
+    });
+    $('.hour_predict').jRange({
         from:0,
         to: 23,
         step: 1,
@@ -81,12 +86,21 @@ $(document).ready(function() {
                     drawPointOrLine()
             }
         });
-
-    document.getElementById('datePicker').value = "2016-03-01";
-    //document.getElementById('dateStaticGrid').valueAsDate = new Date();
-
-    //$("#iframe").attr("src","bar.html?dataset="+circleDataArr[0][0].dataset+"&labelText="+circleDataArr[0][0].labelText+"&name="+circleDataArr[0][0].name)
-$("#submit").bind("click",function(){
+    $("#date_predict").AnyPicker(
+        {
+            mode: "datetime",
+            dateTimeFormat: "yyyy-MM-dd",
+            minValue: new Date(2016, 03, 01),
+            maxValue: new Date(2016, 03, 10),
+            onSetOutput: function(sOutput, oSelectedValues)
+            {
+                var date_predict =  document.getElementById('date_predict').value;
+                DATE_PREDICT = date_predict.split("-")[0]+date_predict.split("-")[1]+date_predict.split("-")[2];
+                getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+                getPredictServletFun();
+            }
+        });
+    $("#submit").bind("click",function(){
     var val =  $(".timePoint").val();
     FROM_HOUR = val.split(",")[0];
     TO_HOUR = val.split(",")[1];
@@ -97,6 +111,13 @@ $("#submit").bind("click",function(){
         getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
     }
     drawPointOrLine()
+});
+    $("#submit_predict").bind("click",function(){
+    var val =  $(".hour_predict").val();
+        FROM_HOUR_PREDICT = val.split(",")[0];
+        TO_HOUR_PREDICT = val.split(",")[1];
+        getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+        getPredictServletFun();
 });
     $("#selectType").bind("change",function(){
 
@@ -109,79 +130,50 @@ $("#submit").bind("click",function(){
         drawPointOrLine();
     })
 });
-var _Date = new Date("2016-03-01");
-var Year = _Date.getFullYear();
-var  Month= _Date.getMonth()+1;
-var  Day = _Date.getDate();
-if(Month<10){
-    Month = "0"+Month
-}
-if(Day<10){
-    Day = "0"+Day
-}
-var DATE_LAYOUT_POINT = Year+""+Month+""+Day;//获取点数据日期
-var HOUR_LAYOUT_POINT = _Date.getHours();//获取点数据时间
-var DATE_LAYOUT_STATIC_GRID = Year+""+Month+""+Day;//获取静态点数据日期
+document.getElementById('datePicker').value = "2016-03-01";
+document.getElementById('date_predict').value = "2016-04-01";
+var date_input = $("#datePicker").val();
+var date_predict = $("#date_predict").val();
+var DATE_LAYOUT_STATIC_GRID = date_input.split("-")[0]+date_input.split("-")[1]+date_input.split("-")[2];
+var DATE_PREDICT = date_predict.split("-")[0]+date_predict.split("-")[1]+date_predict.split("-")[2];
+var _Date = new Date();
 var HOUR_LAYOUT_STATIC_GRID = _Date.getHours();//获取静态点数据时间
-
 var FROM_HOUR = HOUR_LAYOUT_STATIC_GRID;
 var TO_HOUR = HOUR_LAYOUT_STATIC_GRID;
+var FROM_HOUR_PREDICT = HOUR_LAYOUT_STATIC_GRID;
+var TO_HOUR_PREDICT = HOUR_LAYOUT_STATIC_GRID;
 var tradingArea = 1;
-//var getPointUrl ="/soda-web/getPointInfoByDateTime?date="+DATE_LAYOUT_POINT+"&hour="+HOUR_LAYOUT_POINT;//获取点数据URL
-//var getStaticGridUrl ="/soda-web/getStaticGridCountByDateHour?date="+DATE_LAYOUT_STATIC_GRID+"&hour="+HOUR_LAYOUT_STATIC_GRID;//获取静态点数据URL
 var getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;//获取静态点数据URL
-
-//$(".hourStaticGrid").val(HOUR_LAYOUT_STATIC_GRID+","+HOUR_LAYOUT_STATIC_GRID);
+var getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+getPredictServletFun();
+function getPredictServletFun(){
+    $.ajax({
+        url:getPredictServlet,
+        type:"get",
+        dataType:"json",
+        async: false,
+        success:function(data){
+            var text = "",htext = "",address = "";
+            if(FROM_HOUR_PREDICT==TO_HOUR_PREDICT){
+                htext = "的"+FROM_HOUR_PREDICT+"点的预测人数为"+data.dataList[0].count+"人"
+            }else {
+                htext = "从"+FROM_HOUR_PREDICT+"点到"+TO_HOUR_PREDICT+"点的预测人数为"+data.dataList[0].count+"人"
+            }
+            if(tradingArea == 1){
+                address = "南京东路";
+            }else  if(tradingArea==2){
+                address = "徐家汇";
+            }else {
+                address = "莘庄";
+            }
+            text =  address+DATE_PREDICT+htext;
+            $(".predict_people_count").text(text)
+        }
+    })
+}
 
 $(".timePoint").val(FROM_HOUR+","+TO_HOUR);
-
-var getData = {
-    Init:function(){
-        //getData.getPredictionData();
-        //getData.getRealData();
-    },
-    getPredictionData:function(){
-        $.ajax({
-            url:"/soda-web/getPointInfoByDateTime?date=20160301&hour=15",
-            type:"get",
-            dataType:"json",
-            async: false,
-            success:function(data){
-                for(var i = 0;i<data.dataList.length;i++){
-                    if(data.dataList[i].src_longitude!=""&&data.dataList[i].src_latitude1!=""){
-                        predictionCurveArrs.push([data.dataList[i].src_longitude, data.dataList[i].src_latitude,
-                            data.dataList[i].target_longitude,
-                            data.dataList[i].target_latitude]);
-                    }
-
-                }
-                drawPredictionLine()
-            }
-        })
-    },
-    getRealData:function(){
-        $.ajax({
-            url:getPointUrl,
-            type:"get",
-            dataType:"json",
-            async: false,
-            success:function(data){
-                for(var i = 0;i<data.dataList.length;i++){
-
-                    if(data.dataList[i].src_longitude!=""&&data.dataList[i].src_latitude1!=""){
-
-                        realCurveArrs.push([data.dataList[i].src_longitude, data.dataList[i].src_latitude,
-                            data.dataList[i].target_longitude,
-                            data.dataList[i].target_latitude]);
-                    }
-
-                }
-                 drawRealLine()
-            }
-        })
-    }
-};
-
+$(".hour_predict").val(FROM_HOUR+","+TO_HOUR);
 var echart ={
     pie:  function (data){
         var myChart = echarts.init(document.getElementById('pie'));
@@ -199,7 +191,7 @@ var echart ={
                 legend: {
                     x : 'center',
                     y : 'bottom',
-                    data:['出租车','公交','地铁','公交->地铁','地铁->公交']
+                    data:['出租车','公交','地铁','公交->地铁','地铁->公交',"其他"]
             },
             toolbox: {
                 show : true,
@@ -301,22 +293,7 @@ var echart ={
         // 使用刚指定的配置项和数据显示图表。
         myChart.setOption(option);
     }
-}
-//function chooseDate(){
-//    var date_input =  document.getElementById('datePicker').value;
-//    DATE_LAYOUT_POINT = date_input.split("-")[0]+date_input.split("-")[1]+date_input.split("-")[2];
-//    getPointUrl ="/soda-web/getPointInfoByDateTime?date="+DATE_LAYOUT_POINT+"&hour="+HOUR_LAYOUT_POINT;
-//    realCurveArrs = [];
-//    getData.getRealData()
-//}
-//function chooseTimePoint(){
-//    var val =  $(".timePoint").val();
-//    console.log(val)
-//    HOUR_LAYOUT_POINT = val;
-//    getPointUrl ="/soda-web/getPointInfoByDateTime?date="+DATE_LAYOUT_POINT+"&hour="+HOUR_LAYOUT_POINT;
-//    realCurveArrs = [];
-//    //getData.getRealData()
-//}
+};
     drawTipsLine();
     function drawTipsLine(){
         appendSvg.selectAll(".rect").data(circleDataArr).enter()
@@ -351,7 +328,9 @@ var echart ={
                     });
                     tradingArea = i+1;
                     getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
-                    drawPointOrLine()
+                    getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+                    drawPointOrLine();
+                    getPredictServletFun()
                 }
             });
 
@@ -597,8 +576,6 @@ function drawGrid(){
         //return "M"+startCoordinate.x+" "+startCoordinate.y +" Q"+x0+","+y0+" "+endCoordinate.x+" "+endCoordinate.y
     }
     //drawPredictionLine();
-
-
 var colorArr = ["#ffafaf","#ff5454","#ffa030","#ffe6af","#ffea00","#ff6c00","#05ff28","#4dfff9","#2e8217","#f54fff","#2263d9",
     "#9c00ff","#8d0000","#8f00a4","#e5ff6b","#6d3e2c","#18d091","#0011ea","#0a5d6f","#828b20","#ff7f94","#ff2828","#4000aa","#96671d"];
 //预测虚线
@@ -692,22 +669,6 @@ function drawPredictionLine(root){
     }
 //实线
 function drawRealLine(root){
-    ////绘制箭头
-    //var defs = appendSvg.append("defs");
-    //var arrowMarker = defs.append("marker")
-    //    .attr("id","arrow")
-    //    .attr("markerUnits","strokeWidth")
-    //    .attr("markerWidth","12")
-    //    .attr("markerHeight","12")
-    //    .attr("viewBox","0 0 12 12")
-    //    .attr("refX","6")
-    //    .attr("refY","6")
-    //    .attr("orient","auto");
-    //var arrow_path = "M2,2 L10,6 L2,10 L6,6 L2,2";
-    //arrowMarker.append("path")
-    //    .attr("d",arrow_path)
-    //    .attr("fill","rgba(241,0,23,0.5)");
-
     svg.append("defs").selectAll("marker")
         .data(["arrow0", "arrow1", "arrow2","arrow3","arrow4","arrow5","arrow6","arrow7","arrow8","arrow9","arrow10",
             "arrow11","arrow12","arrow13","arrow14","arrow15","arrow16","arrow17","arrow18","arrow19","arrow20","arrow21","arrow22","arrow23"])
@@ -721,26 +682,6 @@ function drawRealLine(root){
         .attr("orient", "auto")
         .append("path")
         .attr("d", "M0,-5L10,0L0,5");
-
-    ////定义一个线性渐变
-    //var a = d3.rgb(255,0,0);	//红色
-    //var b = d3.rgb(0,255,0);
-    //var defs_line = svg.append("defs");
-    //
-    //var linearGradient = defs_line.append("linearGradient")
-    //    .attr("id","linearColor")
-    //    .attr("x1","0%")
-    //    .attr("y1","0%")
-    //    .attr("x2","100%")
-    //    .attr("y2","0%");
-    //
-    //var stop1 = linearGradient.append("stop")
-    //    .attr("offset","0%")
-    //    .style("stop-color",a.toString());
-    //
-    //var stop2 = linearGradient.append("stop")
-    //    .attr("offset","100%")
-    //    .style("stop-color",b.toString());
     //实线
     var realUpdateCurve = svg.selectAll(".realCurve")
         .data(root);
@@ -810,6 +751,7 @@ function getRadiusAndColor(d){
     //var d = d;
     var r = 0;
     var c = "";
+    var d = parseFloat(d);
     if(d>10000){
         r = 5;
         c = "#FF0000"
@@ -830,19 +772,33 @@ function getRadiusAndColor(d){
 }
 //drawStatusPoint();
 drawPointOrLine();
+var timer;
 function drawPointOrLine(){
+    clearInterval(timer);
     d3.json(getStaticGridUrl,function (error,root){
-        console.log(root,"root")
+        //console.log(root,"root")
         var drawLine = [];
         var drawPoint = [];
+        var drawRect = [];
         if(root.ResultType=="static"){
-            drawPoint = root.dataList;
+            for (var i=0;i<root.dataList.length;i++){
+                if(root.dataList[i].warn){
+                    drawRect.push(root.dataList[i])
+                }else {
+                    drawPoint.push(root.dataList[i])
+                }
+            }
+            //drawPoint = root.dataList;
+           timer = setInterval(function(){
+                drawStatusFlashingPoint(drawRect);
+            },2000);
             drawStatusPoint(drawPoint);
             drawRealLine(drawLine);
             //drawPredictionLine(drawLine);
         }else {
             drawLine = root.dataList;
             drawStatusPoint(drawPoint);
+            drawStatusFlashingPoint(drawRect);
             drawRealLine(drawLine);
             //drawPredictionLine(drawLine)
         }
@@ -868,6 +824,7 @@ function drawStatusPoint(root){
         .attr("fill",function(d){
             return getRadiusAndColor(d.count).c
         });
+
     staticGridEnterCircle.append("circle")
         .attr("class","staticGrid")
         .attr("cx",function(d,i){
@@ -878,6 +835,7 @@ function drawStatusPoint(root){
             return coordinate.y
         })
         .attr("r",function(d){
+            //console.log(d.count)
             return getRadiusAndColor(d.count).r
         })
         .attr("fill",function(d){
@@ -902,36 +860,125 @@ function drawStatusPoint(root){
     })
         })
         .on("mouseover",function(d,i){
-            var y = d3.select(this).attr("cy");
-            var r = d3.select(this).attr("r");
-            var x = d3.select(this).attr("cx") * 1 + 1 * r;
-            x = parseFloat(x)-220;
-            y = parseFloat(y)+20;
+             d3.select(this)
+                 .transition()
+                 .duration(200)
+                 .ease("linear")
+                 .attr("r",7)
+                 .attr("fill","#6d3e2c");
             var tooltip = d3.select("#tooltip")
-                .style("left", x + "px")
-                .style("top", y + "px")
+                .style("left", (d3.event.pageX+15) + "px")
+                .style("top", (d3.event.pageY+15) + "px")
                 .style("display","block");
+            tooltip.select("#total_p").text(d.count);
+        })
+        .on("mouseout",function(d,i){
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .ease("linear")
+                .attr("r",function(d){
+                    return getRadiusAndColor(d.count).r
+                })
+                .attr("fill",function(d){
+                    return getRadiusAndColor(d.count).c
+                });
+            var tooltip = d3.select("#tooltip")
+                .style("display","none")
+        });
+    staticGridExitCircle.remove();
+    }
+function drawStatusFlashingPoint(root){
+    //静态圆点
+    var staticGridUpdateCircle = svg.selectAll(".flashPoint")
+        .data(root);
+    var staticGridEnterCircle = staticGridUpdateCircle.enter();
+    var staticGridExitCircle = staticGridUpdateCircle.exit();
+    staticGridUpdateCircle. attr("cx",function(d,i){
+        var coordinate = getCoordinate(d.longitude, d.latitude);
+        return coordinate.x
+    }).attr("cy",function(d,i){
+            var coordinate = getCoordinate(d.longitude, d.latitude);
+            return coordinate.y
+        })
+        .attr("fill",function(d){
+            return "#ff2828"
+        })
+        .transition('size')
+        .attr('r', 0)
+        .duration(1000)
+
+        .transition('size')
+        .attr('r', 7)
+        .duration(1000);
+
+    staticGridEnterCircle.append("circle")
+        .attr("class","flashPoint")
+        .attr("cx",function(d,i){
+            var coordinate = getCoordinate(d.longitude, d.latitude);
+            return coordinate.x
+        }).attr("cy",function(d,i){
+            var coordinate = getCoordinate(d.longitude, d.latitude);
+            return coordinate.y
+        })
+        .attr("fill",function(d){
+            return "#ff2828"
+        })
+        .on("click",function(d,i){
+            $("#bar").css("display","inline-block");
             $.ajax({
                 url:"/soda-web/getGridPeopleGroup2?groupId="+ d.grid_people_group_id,
                 type:"get",
                 dataType:"json",
                 async: false,
                 success:function(data){
-                   var count = 0;
+                    var dataX = [];
+                    var dataY = [];
                     for(var i=0;i<data.dataList.length;i++){
-                        count+=parseFloat(data.dataList[i].count);
+                        dataX.push(data.dataList[i].type);
+                        dataY.push(data.dataList[i].count);
                     }
-                    tooltip.select("#total_p").text(count);
+                    echart.bar(dataX,dataY)
                 }
             })
-
         })
-        .on("mouseout",function(d,i){
-            var tooltip = d3.select("#tooltip")
-                .style("display","none")
-        });
+        //.on("mouseover",function(d,i){
+        //    d3.select(this)
+        //        .transition()
+        //        .duration(200)
+        //        .ease("linear")
+        //        .attr("r",7)
+        //        .attr("fill","#6d3e2c");
+        //    var tooltip = d3.select("#tooltip")
+        //        .style("left", (d3.event.pageX+15) + "px")
+        //        .style("top", (d3.event.pageY+15) + "px")
+        //        .style("display","block");
+        //    tooltip.select("#total_p").text(d.count);
+        //})
+        //.on("mouseout",function(d,i){
+        //    d3.select(this)
+        //        .transition()
+        //        .duration(200)
+        //        .ease("linear")
+        //        .attr("r",function(d){
+        //            return getRadiusAndColor(d.count).r
+        //        })
+        //        .attr("fill",function(d){
+        //            return getRadiusAndColor(d.count).c
+        //        });
+        //    var tooltip = d3.select("#tooltip")
+        //        .style("display","none")
+        //})
+
+        .transition('size')
+        .attr('r', 0)
+        .duration(1000)
+
+        .transition('size')
+        .attr('r', 5)
+        .duration(1000);
     staticGridExitCircle.remove();
-    }
+}
 
 
 
