@@ -92,6 +92,17 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     			<a href="getClassLineServlet?date=20160301&fromHour=15&toHour=16&tradingArea=1&classType=5">效果</a>
     		</td>
   		</tr>
+  		<tr>
+  		<td>getPredictServlet</td>
+    		<td>商圈预测数据 </td>
+    		<td>日期，开始时间，结束时间，商圈</td>
+    		<td>
+    			数量
+    		</td>
+    		<td>
+    			<a href="getPredictServlet?date=20160401&fromHour=15&toHour=18&tradingArea=1">效果</a>
+    		</td>
+  		</tr>
     </table>
   </body>
 </html>
