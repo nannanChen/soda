@@ -168,7 +168,7 @@ public class ClassLineServlet extends HttpServlet {
 	    		
 	    		JSONObject dt=new JSONObject();
 	    		dt.put("name", "地铁");
-	    		dt.put("value", (int) (num*0.7));
+	    		dt.put("value", (int) (num*0.69));
 	    		graphData.put(dt);
 	    		
 	    		JSONObject gjToDt=new JSONObject();
@@ -180,6 +180,11 @@ public class ClassLineServlet extends HttpServlet {
 	    		dtToGj.put("name", "地铁->公交");
 	    		dtToGj.put("value", (int) (num*0.07));
 	    		graphData.put(dtToGj);
+	    		
+	    		JSONObject other=new JSONObject();
+	    		other.put("name", "其他");
+	    		other.put("value", (int) (num*0.01));
+	    		graphData.put(other);
 	        }
 	        System.out.println(new Date()+" ClassLineServlet graphData="+graphData);
 	        json.put("graphData",graphData);
