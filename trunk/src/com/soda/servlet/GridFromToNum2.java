@@ -232,6 +232,7 @@ public class GridFromToNum2 extends HttpServlet {
 	        json.put("status", "OK");
 	        json.put("ResultType", "static");
         	JSONArray dataList=new JSONArray();
+        	int total=0;
 	        while(resultSet.next()){
 	    		JSONObject data=new JSONObject();
 	    		data.put("date",resultSet.getString("DATE"));
@@ -246,6 +247,8 @@ public class GridFromToNum2 extends HttpServlet {
 	        	
 	        	int count=resultSet.getInt("COUNT");
 	        	data.put("count",count);
+	        	
+	        	total+=count;
 	        	
 //	        	data.put("from_index",from_index);
 
@@ -266,6 +269,7 @@ public class GridFromToNum2 extends HttpServlet {
 	        }
 			System.out.println(new Date()+" GridFromToNum2 dataList="+dataList.length());
 	        json.put("dataList",dataList);
+	        json.put("total",total);
 		}catch(Exception e){
 			e.printStackTrace();
 			json.put("status", "error");
