@@ -348,7 +348,7 @@ var echart ={
             .style('font-family', '微软雅黑')
             .text(function(d){
                 return d[0].name;
-            })
+            });
 
     ////    虚实线表示
     //var Mx = width-150,
@@ -407,6 +407,47 @@ var echart ={
     //            drawPredictionLine()
     //        }
     //    });
+}
+drawTipCircle();
+function  drawTipCircle(){
+    var circleArrs = [500,3000,5500,55500];
+    appendSvg.selectAll(".tipCircle").data(circleArrs).enter()
+        .append("circle")
+        .attr("class","tipCircle")
+        .attr("cx",width-160)
+        .attr("cy",function(d,i){
+            return height-30*(i+1)
+        })
+        .attr("r",function(d){
+            return getRadiusAndColor(d).r
+        })
+        .attr("fill",function(d){
+            return getRadiusAndColor(d).c
+        });
+
+    appendSvg.selectAll(".circleText").data(circleArrs).enter()
+        .append("text")
+        .attr("class","circleText")
+        .attr("x",width-150)
+        .attr("y",function(d,i){
+            return height-30*(i+1)+3
+        })
+        .style('fill', 'white')
+        .style('font-size', '10px')
+        .style('font-family', '微软雅黑')
+        .text(function(d){
+            var text = "";
+            if(d>10000){
+                text = "大于10000人"
+            }else if(d>5000&&d<=10000){
+                text = "小于等于10000大于5000人"
+            }else if(d>2000&&d<=5000){
+              text = "小于等于5000大于2000人"
+            }else {
+                text = "小于等于2000人"
+            }
+            return text;
+        });
 }
     drawMap();
     function  drawMap(){
@@ -765,7 +806,7 @@ function getRadiusAndColor(d){
         c = "#EEEE00"
     }else if(d>2000&&d<=5000){
         r = 3
-        c = "#EEC900"
+        c = "#156dd0"
     }else {
         r = 2
         c = "#EE9572"
@@ -799,6 +840,17 @@ function drawPointOrLine(){
             },2000);
             drawStatusPoint(drawPoint);
             drawRealLine(drawLine);
+            var text = "",htext = "",address = "";
+                htext = "的"+FROM_HOUR+"点的实际人数为"+root.total+"人"
+            if(tradingArea == 1){
+                address = "南京东路";
+            }else  if(tradingArea==2){
+                address = "徐家汇";
+            }else {
+                address = "莘庄";
+            }
+            text =  address+DATE_LAYOUT_STATIC_GRID+htext;
+            $(".people_count").text(text)
             //drawPredictionLine(drawLine);
         }else {
             drawLine = root.dataList;
@@ -806,8 +858,11 @@ function drawPointOrLine(){
             drawStatusFlashingPoint(drawRect);
             drawRealLine(drawLine);
             //drawPredictionLine(drawLine)
+            $(".people_count").text("")
         }
         echart.pie(root.graphData)
+
+
     })
 }
 function drawStatusPoint(root){
