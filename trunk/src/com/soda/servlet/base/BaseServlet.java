@@ -47,17 +47,38 @@ public class BaseServlet extends HttpServlet {
 	}
 	
 	
+	public int queryTotalByHour(String date,Integer hour,Integer tradingArea,String classType){
+		System.out.println(new Date()+" BaseServlet queryTotalByHour date="+date+" hour="+hour+" tradingArea="+tradingArea+" classType="+classType);
+		String sql="SELECT t1.DATE,t1.HOUR,t1.FROM_INDEX,SUM(t2.COUNT) AS total FROM grid_from_to_num1 t1 JOIN grid_people_group1 t2 ON t1.grid_people_group_id=t2.grid_people_group_id WHERE t1.DATE=? AND t1.HOUR=? AND t2.type=?  AND t1.COUNT>1000 AND t1.FROM_INDEX=?";
+		List<Object> params=new ArrayList<Object>();
+		params.add(date);
+		params.add(hour);
+		params.add(classType);
+		params.add(tradingArea);
+		return queryCommonTotalByHour(params,sql);
+	}
+	
 	public int queryTotalByHour(String date,Integer hour,Integer tradingArea){
 		System.out.println(new Date()+" BaseServlet queryTotalByHour date="+date+" hour="+hour+" tradingArea="+tradingArea);
+		String sql="SELECT SUM(COUNT) AS total FROM `grid_from_to_num1` WHERE DATE=? AND HOUR=? AND COUNT>1000 AND FROM_INDEX=?";
+		List<Object> params=new ArrayList<Object>();
+		params.add(date);
+		params.add(hour);
+		params.add(tradingArea);
+		return queryCommonTotalByHour(params,sql);
+	}
+	
+	private int queryCommonTotalByHour(List<Object> params,String querySql){
+		System.out.println(new Date()+" BaseServlet queryCommonTotalByHour querySql="+querySql);
 		Connection connection=null;
 		PreparedStatement pstmt=null;
 		ResultSet resultSet=null;
 		try{
 			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT SUM(COUNT) AS total FROM `grid_from_to_num1` WHERE DATE=? AND HOUR=? AND COUNT>1000 AND FROM_INDEX=?");
-	        pstmt.setString(1, date);
-	        pstmt.setInt(2, hour);
-	        pstmt.setInt(3, tradingArea);
+	        pstmt = connection.prepareStatement(querySql);
+	        for(int i=0;i<params.size();i++){
+		        pstmt.setObject(i+1, params.get(i));
+	        }
 	        resultSet = pstmt.executeQuery();
 	        while(resultSet.next()){
 	        	int total=resultSet.getInt("total");

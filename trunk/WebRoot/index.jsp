@@ -58,7 +58,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     		<td>画线（动态）   画点（静态）</td>
     		<td>动态：日期，开始时间，结束时间，商圈  <br/>
     			（开始时间，结束时间不同，动态数据）<br/>
-    			静态：日期，开始时间，结束时间 <br/>
+    			静态：日期，开始时间，结束时间 ，商圈 <br/>
     			（开始时间，结束时间相同，静态数据）
     		</td>
     		<td>
@@ -68,7 +68,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     		</td>
     		<td>
     			<a href="getGridFromToNum2?date=20160301&fromHour=15&toHour=16&tradingArea=1">效果(动态)</a><br/>
-    			<a href="getGridFromToNum2?date=20160301&fromHour=15&toHour=15">效果(静态)</a>
+    			<a href="getGridFromToNum2?date=20160301&fromHour=15&toHour=15&tradingArea=1">效果(静态)</a>
     		</td>
   		</tr>
   		<tr>
