@@ -127,6 +127,7 @@ $(document).ready(function() {
         }else {
             getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
         }
+        $(".people_count").text("");
         drawPointOrLine();
     })
 });
