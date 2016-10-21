@@ -127,7 +127,6 @@ $(document).ready(function() {
         }else {
             getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
         }
-        $(".people_count").text("");
         drawPointOrLine();
     })
 });
@@ -827,6 +826,27 @@ function drawPointOrLine(){
         var drawLine = [];
         var drawPoint = [];
         var drawRect = [];
+        var text = "",htext = "",address = "";
+        var total = 0;
+        if(root.total){
+            total = root.total;
+        }else {
+            total = 0
+        }
+        if(FROM_HOUR==TO_HOUR){
+            htext = "的"+FROM_HOUR+"点的实际人数为"+total+"人"
+        }else {
+            htext = "从"+FROM_HOUR+"点到"+TO_HOUR+"点的实际人数为"+total+"人"
+        }
+        if(tradingArea == 1){
+            address = "南京东路";
+        }else  if(tradingArea==2){
+            address = "徐家汇";
+        }else {
+            address = "莘庄";
+        }
+        text =  address+DATE_LAYOUT_STATIC_GRID+htext;
+        $(".people_count").text(text);
         if(root.ResultType=="static"){
             for (var i=0;i<root.dataList.length;i++){
                 if(root.dataList[i].warn){
@@ -841,17 +861,7 @@ function drawPointOrLine(){
             },2000);
             drawStatusPoint(drawPoint);
             drawRealLine(drawLine);
-            var text = "",htext = "",address = "";
-                htext = "的"+FROM_HOUR+"点的实际人数为"+root.total+"人"
-            if(tradingArea == 1){
-                address = "南京东路";
-            }else  if(tradingArea==2){
-                address = "徐家汇";
-            }else {
-                address = "莘庄";
-            }
-            text =  address+DATE_LAYOUT_STATIC_GRID+htext;
-            $(".people_count").text(text)
+
             //drawPredictionLine(drawLine);
         }else {
             drawLine = root.dataList;
@@ -859,11 +869,8 @@ function drawPointOrLine(){
             drawStatusFlashingPoint(drawRect);
             drawRealLine(drawLine);
             //drawPredictionLine(drawLine)
-            $(".people_count").text("")
         }
-        echart.pie(root.graphData)
-
-
+        echart.pie(root.graphData);
     })
 }
 function drawStatusPoint(root){
