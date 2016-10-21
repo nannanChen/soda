@@ -7,13 +7,17 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import com.soda.common.GridDivide;
 import com.soda.common.Point;
 import com.soda.servlet.base.BaseServlet;
@@ -41,18 +45,22 @@ public class ClassLineServlet extends BaseServlet {
 			Integer toH=Integer.parseInt(toHour);
 			Integer classTypeI=Integer.parseInt(classType);
 			if(fromH.intValue()==toH.intValue()){
-		        System.out.println(new Date()+" ClassLineServlet 时间一样，静态参数，无轨迹");
-		        json.put("status", "OK");
-		        json.put("message", "静态参数，无轨迹");
+				json=queryStatic(json,date,fromH,toH,tradingArea,classType);
+				int total=queryTotalByHour(date,fromH,tradingAreaMap.get(tradingArea),classType);
+		        json.put("total",total);
 			}else{
 				List<Integer> gridIndexs=new ArrayList<Integer>();
 				gridIndexs.add(tradingAreaMap.get(tradingArea));
 				Integer currentHour=toH;
+				int total=0;
 				do{
 					json=queryDynamic(json,date,currentHour,gridIndexs,classTypeI);
+					int count=queryTotalByHour(date,currentHour,tradingAreaMap.get(tradingArea),classType);
+					total+=count;
 					currentHour--;
 					System.out.println("fromH="+fromH+" currentHour="+currentHour+" fromH<=currentHour="+(fromH<=currentHour));
 				}while(fromH<=currentHour&&gridIndexs.size()!=0);
+				json.put("total",total);
 				JSONArray dataList=null;
 		        try{
 		        	dataList=json.getJSONArray("dataList");
@@ -107,6 +115,62 @@ public class ClassLineServlet extends BaseServlet {
 	        	dataList.put(data);
 	        }
 	        System.out.println(new Date()+" ClassLineServlet currentHour="+currentHour+" dataList="+dataList.length());
+	        json.put("dataList",dataList);
+		}catch(Exception e){
+			e.printStackTrace();
+			json.put("status", "error");
+			json.put("message", "查询失败！");
+		}finally{
+			release(connection,pstmt,resultSet);
+		}
+		return json;
+	}
+	
+	
+	private JSONObject queryStatic(JSONObject json,String date,Integer fromH,Integer toH,String tradingArea,String classType){
+		Connection connection=null;
+		PreparedStatement pstmt=null;
+		ResultSet resultSet=null;
+		try{
+			connection=dataSource.getConnection();
+	        pstmt = connection.prepareStatement("SELECT t1.DATE,t1.HOUR,t1.FROM_INDEX,SUM(t2.COUNT) AS COUNT FROM grid_from_to_num1 t1 JOIN grid_people_group1 t2 ON t1.grid_people_group_id=t2.grid_people_group_id WHERE t1.DATE=? AND t1.HOUR=? AND t2.type=?  AND t1.COUNT>1000 GROUP BY FROM_INDEX");
+	        pstmt.setString(1, date);
+	        pstmt.setInt(2, fromH);
+	        pstmt.setString(3, classType);
+	        resultSet = pstmt.executeQuery();
+	        json.put("status", "OK");
+	        json.put("ResultType", "static");
+        	JSONArray dataList=new JSONArray();
+	        while(resultSet.next()){
+	    		JSONObject data=new JSONObject();
+	    		data.put("date",resultSet.getString("DATE"));
+	    		
+	    		int hour=resultSet.getInt("HOUR");
+	    		data.put("hour",hour);
+	    		
+	    		String from_index=resultSet.getString("FROM_INDEX");
+	    		Point point=GridDivide.indexMap.get(from_index);
+	        	data.put("longitude",point.x);
+	        	data.put("latitude",point.y);
+	        	
+	        	int count=resultSet.getInt("COUNT");
+	        	data.put("count",count);
+	        	
+	        	Map<String,Integer> warnAverage=(Map<String,Integer>)this.getServletContext().getAttribute("warn_Average");
+	    		int avg=warnAverage.get(from_index+"_"+hour);
+	        	if(avg<10000){
+		        	data.put("warn",false);
+	        	}else{
+	        		if(count>avg*1.1){
+			        	data.put("warn",true);
+	        		}else{
+	        			data.put("warn",false);
+	        		}
+	        	}
+	        	
+	        	dataList.put(data);
+	        }
+			System.out.println(new Date()+" GridFromToNum2 dataList="+dataList.length());
 	        json.put("dataList",dataList);
 		}catch(Exception e){
 			e.printStackTrace();
