@@ -63,7 +63,7 @@ public class GridFromToNum2 extends HttpServlet {
 			Integer fromH=Integer.parseInt(fromHour);
 			Integer toH=Integer.parseInt(toHour);
 			if(fromH.intValue()==toH.intValue()){
-				json=queryStatic(json,date,fromH,toH);
+				json=queryStatic(json,date,fromH,toH,tradingArea);
 			}else{
 				List<Integer> gridIndexs=new ArrayList<Integer>();
 				gridIndexs.add(tradingAreaMap.get(tradingArea));
@@ -219,7 +219,7 @@ public class GridFromToNum2 extends HttpServlet {
 		return in.toString();
 	}
 	
-	public JSONObject queryStatic(JSONObject json,String date,Integer fromH,Integer toH){
+	public JSONObject queryStatic(JSONObject json,String date,Integer fromH,Integer toH,String tradingArea){
 		Connection connection=null;
 		PreparedStatement pstmt=null;
 		ResultSet resultSet=null;
@@ -248,7 +248,9 @@ public class GridFromToNum2 extends HttpServlet {
 	        	int count=resultSet.getInt("COUNT");
 	        	data.put("count",count);
 	        	
-	        	total+=count;
+	        	if(tradingAreaMap.get(tradingArea).intValue()==Integer.parseInt(from_index)){
+	        		total+=count;
+	        	}
 	        	
 //	        	data.put("from_index",from_index);
 
