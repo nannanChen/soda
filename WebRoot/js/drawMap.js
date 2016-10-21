@@ -72,7 +72,7 @@ $(document).ready(function() {
             mode: "datetime",
             dateTimeFormat: "yyyy-MM-dd",
             minValue: new Date(2016, 02, 01),
-            maxValue: new Date(2016, 03, 30),
+            maxValue: new Date(2016, 02, 31),
             onSetOutput: function(sOutput, oSelectedValues)
             {
                 var date_input =  document.getElementById('datePicker').value;
@@ -551,28 +551,33 @@ function drawGrid(){
     function line(d){
         var startCoordinate = getCoordinate(d.from_longitude, d.from_latitude);
         var endCoordinate = getCoordinate(d.to_longitude, d.to_latitude);
-        var length = Math.sqrt(Math.pow(startCoordinate.x-endCoordinate.x,2)+Math.pow(startCoordinate.y-endCoordinate.y,2));
-        //console.log(length)
-        var x0 = (startCoordinate.x+endCoordinate.x)/2;
-        var y0 = (startCoordinate.y+endCoordinate.y)/2;
-        var hight = length/2*Math.tan(Math.PI/6);
-        y0 = y0+hight;
         var line = d3.svg.line()
             .x(function(d) { return d.x; })
             .y(function(d) { return d.y; })
             .interpolate("basis");
 
-        //if(d.hour=="11"){
-        //    return line([{x:startCoordinate.x,y:startCoordinate.y},{x:x0,y:y0},{x:endCoordinate.x,y:endCoordinate.y}]);
-        //}else {
-        //    //return line.tension([{x:startCoordinate.x,y:startCoordinate.y},{x:x0,y:y0},{x:endCoordinate.x,y:endCoordinate.y}])
-        //    return line([{x:startCoordinate.x,y:startCoordinate.y},{x:endCoordinate.x,y:endCoordinate.y}]);
-        //}
+       var startX = "",startY = "",endX = "",endY = "";
+        var num = parseInt(Math.random()*(25-1+1)+1,10);
+        //startX = startCoordinate.x- d.hour;
+        //startY = startCoordinate.y- d.hour;
+        //endX = endCoordinate.x- d.hour;
+        //endY = endCoordinate.y- d.hour;
+        if(d.hour<=10){
+            startX = startCoordinate.x- num;
+            startY = startCoordinate.y- num;
+            endX = endCoordinate.x- num;
+            endY = endCoordinate.y- num
+        }else {
+            startX = startCoordinate.x+num;
+            startY = startCoordinate.y+num;
+            endX = endCoordinate.x+num;
+            endY = endCoordinate.y+num
+        }
 
-        var dx = endCoordinate.x - startCoordinate.x,
-            dy = endCoordinate.y -startCoordinate.y,
+        var dx = endX - startX,
+            dy = endY -startY,
             dr = Math.sqrt(dx * dx + dy * dy);
-        return "M" + startCoordinate.x + "," + startCoordinate.y + "A" + dr + "," + dr + " 0 0,1 " + endCoordinate.x + "," + endCoordinate.y;
+        return "M" + startCoordinate.x + "," + startY + "A" + dr + "," + dr + " 0 0,1 " + endCoordinate.x + "," + endY;
         //return "M"+startCoordinate.x+" "+startCoordinate.y +" Q"+x0+","+y0+" "+endCoordinate.x+" "+endCoordinate.y
     }
     //drawPredictionLine();
@@ -865,7 +870,7 @@ function drawStatusPoint(root){
                  .duration(200)
                  .ease("linear")
                  .attr("r",7)
-                 .attr("fill","#6d3e2c");
+                 .attr("fill","#1ad015");
             var tooltip = d3.select("#tooltip")
                 .style("left", (d3.event.pageX+15) + "px")
                 .style("top", (d3.event.pageY+15) + "px")
@@ -942,33 +947,33 @@ function drawStatusFlashingPoint(root){
                 }
             })
         })
-        //.on("mouseover",function(d,i){
-        //    d3.select(this)
-        //        .transition()
-        //        .duration(200)
-        //        .ease("linear")
-        //        .attr("r",7)
-        //        .attr("fill","#6d3e2c");
-        //    var tooltip = d3.select("#tooltip")
-        //        .style("left", (d3.event.pageX+15) + "px")
-        //        .style("top", (d3.event.pageY+15) + "px")
-        //        .style("display","block");
-        //    tooltip.select("#total_p").text(d.count);
-        //})
-        //.on("mouseout",function(d,i){
-        //    d3.select(this)
-        //        .transition()
-        //        .duration(200)
-        //        .ease("linear")
-        //        .attr("r",function(d){
-        //            return getRadiusAndColor(d.count).r
-        //        })
-        //        .attr("fill",function(d){
-        //            return getRadiusAndColor(d.count).c
-        //        });
-        //    var tooltip = d3.select("#tooltip")
-        //        .style("display","none")
-        //})
+        .on("mouseover",function(d,i){
+            //d3.select(this)
+            //    .transition()
+            //    .duration(200)
+            //    .ease("linear")
+            //    .attr("r",7)
+            //    .attr("fill","#6d3e2c");
+            var tooltip = d3.select("#tooltip")
+                .style("left", (d3.event.pageX+15) + "px")
+                .style("top", (d3.event.pageY+15) + "px")
+                .style("display","block");
+            tooltip.select("#total_p").text(d.count);
+        })
+        .on("mouseout",function(d,i){
+            //d3.select(this)
+            //    .transition()
+            //    .duration(200)
+            //    .ease("linear")
+            //    .attr("r",function(d){
+            //        return getRadiusAndColor(d.count).r
+            //    })
+            //    .attr("fill",function(d){
+            //        return getRadiusAndColor(d.count).c
+            //    });
+            var tooltip = d3.select("#tooltip")
+                .style("display","none")
+        })
 
         .transition('size')
         .attr('r', 0)
