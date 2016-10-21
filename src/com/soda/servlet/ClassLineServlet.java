@@ -4,51 +4,28 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.soda.common.DataSourceUtil;
 import com.soda.common.GridDivide;
 import com.soda.common.Point;
+import com.soda.servlet.base.BaseServlet;
 
-public class ClassLineServlet extends HttpServlet {
-	
-    public static Map<String,Integer> tradingAreaMap=new HashMap<String,Integer>();
+public class ClassLineServlet extends BaseServlet {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private BasicDataSource dataSource=DataSourceUtil.dataSource;
 
-	public ClassLineServlet() {
-		super();
-	}
-
-	public void destroy() {
-		super.destroy(); // Just puts "destroy" string in log
-	}
-
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doPost(request,response);
-	}
-
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("text/json; charset=UTF-8");  
@@ -89,7 +66,7 @@ public class ClassLineServlet extends HttpServlet {
 		response.getOutputStream().write(json.toString().getBytes("UTF-8"));
 	}
 	
-	public JSONObject queryDynamic(JSONObject json,String date,Integer currentHour,List<Integer> gridIndexs,Integer classType){
+	private JSONObject queryDynamic(JSONObject json,String date,Integer currentHour,List<Integer> gridIndexs,Integer classType){
 		System.out.println(new Date()+" ClassLineServlet queryDynamic date="+date+" currentHour="+currentHour+" gridIndexs="+gridIndexs);
 		Connection connection=null;
 		PreparedStatement pstmt=null;
@@ -141,91 +118,7 @@ public class ClassLineServlet extends HttpServlet {
 		return json;
 	}
 	
-	
-	public JSONObject queryGraph(JSONObject json,String date,Integer fromH,Integer toH,Integer classTypeI){
-		System.out.println(new Date()+" ClassLineServlet queryGraph date="+date+" fromH="+fromH+" toH="+toH+" classTypeI="+classTypeI);
-		Connection connection=null;
-		PreparedStatement pstmt=null;
-		ResultSet resultSet=null;
-		try{
-			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT SUM(t2.count) AS NUM FROM grid_from_to_num1 t1 JOIN grid_people_group1 t2 ON t1.grid_people_group_id=t2.grid_people_group_id WHERE t2.type=? AND t1.COUNT>1000 AND t1.DATE=? AND t1.HOUR "+queryWhereInByHour(fromH,toH));
-	        pstmt.setInt(1, classTypeI);
-	        pstmt.setString(2, date);
-	        resultSet = pstmt.executeQuery();
-        	JSONArray graphData=new JSONArray();
-	        if(resultSet.next()){
-	    		int num=resultSet.getInt("NUM");
-	    		JSONObject czc=new JSONObject();
-	    		czc.put("name", "出租车");
-	    		czc.put("value", (int) (num*0.03));
-	    		graphData.put(czc);
-	    		
-	    		JSONObject gj=new JSONObject();
-	    		gj.put("name", "公交");
-	    		gj.put("value", (int) (num*0.15));
-	    		graphData.put(gj);
-	    		
-	    		JSONObject dt=new JSONObject();
-	    		dt.put("name", "地铁");
-	    		dt.put("value", (int) (num*0.69));
-	    		graphData.put(dt);
-	    		
-	    		JSONObject gjToDt=new JSONObject();
-	    		gjToDt.put("name", "公交->地铁");
-	    		gjToDt.put("value", (int) (num*0.05));
-	    		graphData.put(gjToDt);
-	    		
-	    		JSONObject dtToGj=new JSONObject();
-	    		dtToGj.put("name", "地铁->公交");
-	    		dtToGj.put("value", (int) (num*0.07));
-	    		graphData.put(dtToGj);
-	    		
-	    		JSONObject other=new JSONObject();
-	    		other.put("name", "其他");
-	    		other.put("value", (int) (num*0.01));
-	    		graphData.put(other);
-	        }
-	        System.out.println(new Date()+" ClassLineServlet graphData="+graphData);
-	        json.put("graphData",graphData);
-		}catch(Exception e){
-			e.printStackTrace();
-			json.put("GraphStatus", "Graph Error");
-			json.put("GraphMessage", "Graph查询失败！");
-		}finally{
-			release(connection,pstmt,resultSet);
-		}
-		return json;
-	}
-	
-	//IN(1,2,3)
-	public String queryWhereInByHour(Integer fromH,Integer toH){
-		StringBuffer in=new StringBuffer("IN(");
-		for(int i=fromH;i<=toH;i++){
-			if(i==toH){
-				in.append(i+")");
-			}else{
-				in.append(i+",");
-			}
-		}
-		System.out.println(new Date()+" queryWhereInByHour in="+in.toString());
-		return in.toString();
-	}
-	
-	public String queryWhereInByIndex(List<Integer> gridIndexs){
-		StringBuffer in=new StringBuffer("IN(");
-		for(int i=0;i<gridIndexs.size();i++){
-			if(i==gridIndexs.size()-1){
-				in.append(gridIndexs.get(i).intValue()+")");
-			}else{
-				in.append(gridIndexs.get(i).intValue()+",");
-			}
-		}
-		System.out.println(new Date()+" queryWhereInByIndex in="+in.toString());
-		return in.toString();
-	}
-	
-	public boolean checkParam(JSONObject json,String date,String fromHour,String toHour,String tradingArea,String classType){
+	private boolean checkParam(JSONObject json,String date,String fromHour,String toHour,String tradingArea,String classType){
 		if(StringUtils.isNotBlank(date)&&StringUtils.isNotBlank(fromHour)&&StringUtils.isNotBlank(toHour)&&StringUtils.isNotBlank(classType)){
 			if(date.length()==8){
 				try{
@@ -272,35 +165,4 @@ public class ClassLineServlet extends HttpServlet {
 		}
 		return false;
 	}
-	
-	public void release(Connection connection, PreparedStatement pstmt, ResultSet resultSet) {
-        if(resultSet!=null){
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(pstmt!=null){
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(connection!=null){
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-	public void init() throws ServletException {
-		tradingAreaMap.put("1",157);
-		tradingAreaMap.put("2",180);
-		tradingAreaMap.put("3",226);
-	}
-
 }

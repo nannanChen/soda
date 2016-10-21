@@ -4,51 +4,29 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.soda.common.DataSourceUtil;
 import com.soda.common.GridDivide;
 import com.soda.common.Point;
+import com.soda.servlet.base.BaseServlet;
 
-public class GridFromToNum2 extends HttpServlet {
-	
-    public static Map<String,Integer> tradingAreaMap=new HashMap<String,Integer>();
+public class GridFromToNum2 extends BaseServlet {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private BasicDataSource dataSource=DataSourceUtil.dataSource;
 
-	public GridFromToNum2() {
-		super();
-	}
-
-	public void destroy() {
-		super.destroy(); // Just puts "destroy" string in log
-	}
-
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doPost(request,response);
-	}
-
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("text/json; charset=UTF-8");  
@@ -64,15 +42,21 @@ public class GridFromToNum2 extends HttpServlet {
 			Integer toH=Integer.parseInt(toHour);
 			if(fromH.intValue()==toH.intValue()){
 				json=queryStatic(json,date,fromH,toH,tradingArea);
+				int total=queryTotalByHour(date,fromH,tradingAreaMap.get(tradingArea));
+		        json.put("total",total);
 			}else{
 				List<Integer> gridIndexs=new ArrayList<Integer>();
 				gridIndexs.add(tradingAreaMap.get(tradingArea));
 				Integer currentHour=toH;
+				int total=0;
 				do{
 					json=queryDynamic(json,date,currentHour,gridIndexs);
+					int count=queryTotalByHour(date,currentHour,tradingAreaMap.get(tradingArea));
+					total+=count;
 					currentHour--;
-					System.out.println("fromH="+fromH+" currentHour="+currentHour+" fromH<=currentHour="+(fromH<=currentHour));
+					System.out.println("fromH="+fromH+" currentHour="+currentHour+" fromH<=currentHour="+(fromH<=currentHour)+" total="+total);
 				}while(fromH<=currentHour&&gridIndexs.size()!=0);
+		        json.put("total",total);
 				JSONArray dataList=null;
 		        try{
 		        	dataList=json.getJSONArray("dataList");
@@ -86,62 +70,7 @@ public class GridFromToNum2 extends HttpServlet {
 		response.getOutputStream().write(json.toString().getBytes("UTF-8"));
 	}
 	
-	public JSONObject queryGraph(JSONObject json,String date,Integer fromH,Integer toH){
-		System.out.println(new Date()+" GridFromToNum2 queryGraph date="+date+" fromH="+fromH+" toH="+toH);
-		Connection connection=null;
-		PreparedStatement pstmt=null;
-		ResultSet resultSet=null;
-		try{
-			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT SUM(COUNT) AS NUM FROM `grid_from_to_num1` WHERE DATE=? AND COUNT>1000 AND HOUR "+queryWhereInByHour(fromH,toH));
-	        pstmt.setString(1, date);
-	        resultSet = pstmt.executeQuery();
-        	JSONArray graphData=new JSONArray();
-	        if(resultSet.next()){
-	    		int num=resultSet.getInt("NUM");
-	    		JSONObject czc=new JSONObject();
-	    		czc.put("name", "出租车");
-	    		czc.put("value", (int) (num*0.03));
-	    		graphData.put(czc);
-	    		
-	    		JSONObject gj=new JSONObject();
-	    		gj.put("name", "公交");
-	    		gj.put("value", (int) (num*0.15));
-	    		graphData.put(gj);
-	    		
-	    		JSONObject dt=new JSONObject();
-	    		dt.put("name", "地铁");
-	    		dt.put("value", (int) (num*0.69));
-	    		graphData.put(dt);
-	    		
-	    		JSONObject gjToDt=new JSONObject();
-	    		gjToDt.put("name", "公交->地铁");
-	    		gjToDt.put("value", (int) (num*0.05));
-	    		graphData.put(gjToDt);
-	    		
-	    		JSONObject dtToGj=new JSONObject();
-	    		dtToGj.put("name", "地铁->公交");
-	    		dtToGj.put("value", (int) (num*0.07));
-	    		graphData.put(dtToGj);
-	    		
-	    		JSONObject other=new JSONObject();
-	    		other.put("name", "其他");
-	    		other.put("value", (int) (num*0.01));
-	    		graphData.put(other);
-	        }
-	        System.out.println(new Date()+" GridFromToNum2 graphData="+graphData);
-	        json.put("graphData",graphData);
-		}catch(Exception e){
-			e.printStackTrace();
-			json.put("GraphStatus", "Graph Error");
-			json.put("GraphMessage", "Graph查询失败！");
-		}finally{
-			release(connection,pstmt,resultSet);
-		}
-		return json;
-	}
-	
-	public JSONObject queryDynamic(JSONObject json,String date,Integer currentHour,List<Integer> gridIndexs){
+	private JSONObject queryDynamic(JSONObject json,String date,Integer currentHour,List<Integer> gridIndexs){
 		System.out.println(new Date()+" GridFromToNum2 queryDynamic date="+date+" currentHour="+currentHour+" gridIndexs="+gridIndexs);
 		Connection connection=null;
 		PreparedStatement pstmt=null;
@@ -192,34 +121,8 @@ public class GridFromToNum2 extends HttpServlet {
 		return json;
 	}
 	
-	//IN(1,2,3)
-	public String queryWhereInByHour(Integer fromH,Integer toH){
-		StringBuffer in=new StringBuffer("IN(");
-		for(int i=fromH;i<=toH;i++){
-			if(i==toH){
-				in.append(i+")");
-			}else{
-				in.append(i+",");
-			}
-		}
-		System.out.println(new Date()+" queryWhereInByHour in="+in.toString());
-		return in.toString();
-	}
 	
-	public String queryWhereInByIndex(List<Integer> gridIndexs){
-		StringBuffer in=new StringBuffer("IN(");
-		for(int i=0;i<gridIndexs.size();i++){
-			if(i==gridIndexs.size()-1){
-				in.append(gridIndexs.get(i).intValue()+")");
-			}else{
-				in.append(gridIndexs.get(i).intValue()+",");
-			}
-		}
-		System.out.println(new Date()+" queryWhereInByIndex in="+in.toString());
-		return in.toString();
-	}
-	
-	public JSONObject queryStatic(JSONObject json,String date,Integer fromH,Integer toH,String tradingArea){
+	private JSONObject queryStatic(JSONObject json,String date,Integer fromH,Integer toH,String tradingArea){
 		Connection connection=null;
 		PreparedStatement pstmt=null;
 		ResultSet resultSet=null;
@@ -232,7 +135,6 @@ public class GridFromToNum2 extends HttpServlet {
 	        json.put("status", "OK");
 	        json.put("ResultType", "static");
         	JSONArray dataList=new JSONArray();
-        	int total=0;
 	        while(resultSet.next()){
 	    		JSONObject data=new JSONObject();
 	    		data.put("date",resultSet.getString("DATE"));
@@ -248,12 +150,6 @@ public class GridFromToNum2 extends HttpServlet {
 	        	int count=resultSet.getInt("COUNT");
 	        	data.put("count",count);
 	        	
-	        	if(tradingAreaMap.get(tradingArea).intValue()==Integer.parseInt(from_index)){
-	        		total+=count;
-	        	}
-	        	
-//	        	data.put("from_index",from_index);
-
 	        	Map<String,Integer> warnAverage=(Map<String,Integer>)this.getServletContext().getAttribute("warn_Average");
 	    		int avg=warnAverage.get(from_index+"_"+hour);
 	        	if(avg<10000){
@@ -271,7 +167,6 @@ public class GridFromToNum2 extends HttpServlet {
 	        }
 			System.out.println(new Date()+" GridFromToNum2 dataList="+dataList.length());
 	        json.put("dataList",dataList);
-	        json.put("total",total);
 		}catch(Exception e){
 			e.printStackTrace();
 			json.put("status", "error");
@@ -282,7 +177,7 @@ public class GridFromToNum2 extends HttpServlet {
 		return json;
 	}
 	
-	public boolean checkParam(JSONObject json,String date,String fromHour,String toHour,String tradingArea){
+	private boolean checkParam(JSONObject json,String date,String fromHour,String toHour,String tradingArea){
 		if(StringUtils.isNotBlank(date)&&StringUtils.isNotBlank(fromHour)&&StringUtils.isNotBlank(toHour)){
 			if(date.length()==8){
 				try{
@@ -323,38 +218,4 @@ public class GridFromToNum2 extends HttpServlet {
 		}
 		return false;
 	}
-	
-	public void release(Connection connection, PreparedStatement pstmt, ResultSet resultSet) {
-        if(resultSet!=null){
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(pstmt!=null){
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(connection!=null){
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-	public void init() throws ServletException {
-//		 addressMap.put("nanJingDong",indexMap.get("157"));
-//	     addressMap.put("xuJiaHui",indexMap.get("180"));
-//	     addressMap.put("xinZhuang",indexMap.get("226"));
-		tradingAreaMap.put("1",157);
-		tradingAreaMap.put("2",180);
-		tradingAreaMap.put("3",226);
-	}
-
 }
