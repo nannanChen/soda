@@ -4,42 +4,24 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Date;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import com.soda.common.CenterData;
-import com.soda.common.DataSourceUtil;
+import com.soda.servlet.base.BaseServlet;
 
-public class GridPeopleGroup2 extends HttpServlet {
+public class GridPeopleGroup2 extends BaseServlet {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private BasicDataSource dataSource=DataSourceUtil.dataSource;
 
-	public GridPeopleGroup2() {
-		super();
-	}
-
-	public void destroy() {
-		super.destroy(); // Just puts "destroy" string in log
-	}
-
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doPost(request,response);
-	}
-
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("text/json; charset=UTF-8");  
@@ -53,7 +35,7 @@ public class GridPeopleGroup2 extends HttpServlet {
 	}
 	
 	
-	public JSONObject queryPeopleGroup(JSONObject json,String groupId){
+	private JSONObject queryPeopleGroup(JSONObject json,String groupId){
 		Connection connection=null;
 		PreparedStatement pstmt=null;
 		ResultSet resultSet=null;
@@ -83,7 +65,7 @@ public class GridPeopleGroup2 extends HttpServlet {
 	}
 	
 	
-	public String queryWhereInByGroupId(String[] groupIds){
+	private String queryWhereInByGroupId(String[] groupIds){
 		StringBuffer in=new StringBuffer("IN(");
 		for(int i=0;i<groupIds.length;i++){
 			if(i==groupIds.length-1){
@@ -97,7 +79,7 @@ public class GridPeopleGroup2 extends HttpServlet {
 	}
 	
 	
-	public boolean checkParam(JSONObject json,String groupId){
+	private boolean checkParam(JSONObject json,String groupId){
 		if(StringUtils.isNotBlank(groupId)){
 			return true;
 		}else{
@@ -107,32 +89,4 @@ public class GridPeopleGroup2 extends HttpServlet {
 		}
 		return false;
 	}
-	
-	public void release(Connection connection, PreparedStatement pstmt, ResultSet resultSet) {
-        if(resultSet!=null){
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(pstmt!=null){
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(connection!=null){
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-	public void init() throws ServletException {
-	}
-
 }

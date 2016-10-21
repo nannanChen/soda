@@ -5,51 +5,27 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import com.soda.servlet.base.BaseServlet;
 
-import com.soda.common.DataSourceUtil;
-import com.soda.common.GridDivide;
-import com.soda.common.Point;
-
-public class PredictDataServlet extends HttpServlet {
-	
-    public static Map<String,Integer> tradingAreaMap=new HashMap<String,Integer>();
+public class PredictDataServlet extends BaseServlet {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private BasicDataSource dataSource=DataSourceUtil.dataSource;
 
-	public PredictDataServlet() {
-		super();
-	}
-
-	public void destroy() {
-		super.destroy(); // Just puts "destroy" string in log
-	}
-
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doPost(request,response);
-	}
-
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("text/json; charset=UTF-8");  
@@ -89,7 +65,7 @@ public class PredictDataServlet extends HttpServlet {
 	
 
 	
-	public JSONObject queryDynamic(JSONObject json,String date,Integer fromHour,Integer toHour,String ind ){
+	private JSONObject queryDynamic(JSONObject json,String date,Integer fromHour,Integer toHour,String ind ){
 		System.out.println(new Date()+" PredictData queryDynamic date="+date+" fromHour="+fromHour+" toHour="+toHour+" ind="+ind);
 		Connection connection=null;
 		PreparedStatement pstmt=null;
@@ -127,24 +103,8 @@ public class PredictDataServlet extends HttpServlet {
 		return json;
 	}
 	
-	//IN(1,2,3)
-	public String queryWhereInByHour(Integer fromH,Integer toH){
-		StringBuffer in=new StringBuffer("IN(");
-		for(int i=fromH;i<=toH;i++){
-			if(i==toH){
-				in.append(i+")");
-			}else{
-				in.append(i+",");
-			}
-		}
-		System.out.println(new Date()+" queryWhereInByHour in="+in.toString());
-		return in.toString();
-	}
-	
-	
-	
 
-	public JSONObject queryStatic(JSONObject json,String date,Integer fromH,Integer toH,String tradingArea){
+	private JSONObject queryStatic(JSONObject json,String date,Integer fromH,Integer toH,String tradingArea){
 		Connection connection=null;
 		PreparedStatement pstmt=null;
 		ResultSet resultSet=null;
@@ -188,7 +148,7 @@ public class PredictDataServlet extends HttpServlet {
 		return json;
 	}
 	
-	public boolean checkParam(JSONObject json,String date,String fromHour,String toHour,String tradingArea){
+	private boolean checkParam(JSONObject json,String date,String fromHour,String toHour,String tradingArea){
 		if(StringUtils.isNotBlank(date)&&StringUtils.isNotBlank(fromHour)&&StringUtils.isNotBlank(toHour)){
 			if(date.length()==8){
 				try{
@@ -230,37 +190,4 @@ public class PredictDataServlet extends HttpServlet {
 		return false;
 	}
 	
-	public void release(Connection connection, PreparedStatement pstmt, ResultSet resultSet) {
-        if(resultSet!=null){
-            try {
-                resultSet.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(pstmt!=null){
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        if(connection!=null){
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-	public void init() throws ServletException {
-//		 addressMap.put("nanJingDong",indexMap.get("157"));
-//	     addressMap.put("xuJiaHui",indexMap.get("180"));
-//	     addressMap.put("xinZhuang",indexMap.get("226"));
-		tradingAreaMap.put("1",157);
-		tradingAreaMap.put("2",180);
-		tradingAreaMap.put("3",226);
-	}
-
 }
