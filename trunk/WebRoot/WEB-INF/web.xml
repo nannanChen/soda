@@ -26,7 +26,11 @@
     <servlet-name>PredictServlet</servlet-name>
     <servlet-class>com.soda.servlet.PredictDataServlet</servlet-class>
   </servlet>
-
+  
+  <servlet>
+    <servlet-name>PredictManTypeServlet</servlet-name>
+    <servlet-class>com.soda.servlet.PredictManTypeServlet</servlet-class>
+  </servlet>
 
 <listener>
 	<listener-class>com.soda.listener.CacheInitListener</listener-class>
@@ -39,6 +43,11 @@
 	<url-pattern>/getPredictServlet</url-pattern>
 </servlet-mapping>
 
+<!-- 预测人群类型 -->
+<servlet-mapping>
+	<servlet-name>PredictManTypeServlet</servlet-name>
+	<url-pattern>/getPredictManTypeServlet</url-pattern>
+</servlet-mapping>
   <servlet-mapping>
   	<!-- 画网格点 -->
     <servlet-name>GridPointServlet</servlet-name>
