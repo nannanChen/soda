@@ -103,6 +103,17 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     			<a href="getPredictServlet?date=20160401&fromHour=15&toHour=18&tradingArea=1">效果</a>
     		</td>
   		</tr>
+  		<tr>
+  		<td>getPredictManTypeServlet</td>
+    		<td>商圈预测人群 </td>
+    		<td>日期，开始时间，结束时间，商圈，类型</td>
+    		<td>
+    			数量
+    		</td>
+    		<td>
+    			<a href="getPredictManTypeServlet?date=20160401&fromHour=15&toHour=15&tradingArea=1&type=9">效果</a>
+    		</td>
+  		</tr>
     </table>
   </body>
 </html>
