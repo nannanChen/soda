@@ -46,7 +46,7 @@
         }
         button.btn {
             position: absolute;
-            right: -59px;
+            right: 15px;
             margin-top: -10px;
             padding: 3px 9px;
             color: white;
@@ -201,12 +201,12 @@
 <div class="main">
 <div class="chooseTime">
     <div>
-        <p>请选择时间段</p>
+        <p><strong>请选择时间段</strong></p>
         <input type="text" class="timePoint"/>
         <button id="submit" class="btn">确定</button>
-        <p style="margin-top: 30px">请选择日期</p>
+        <p style="margin-top: 30px"><strong>请选择日期</strong></p>
         <input type="text" id="datePicker">
-        <p>请选择达人类型</p>
+        <p><strong>请选择达人类型</strong></p>
         <div class="select">
             <select name="" id="selectType">
                 <option value=""></option>
@@ -222,8 +222,8 @@
                 <option value="0">普通人</option>
             </select>
         </div>
-        <div class="people_count" style="margin-top: 15px"> </div>
-        <div style="margin-top: 30px">
+        <div class="people_count" style="margin-top: 15px;border-bottom: 1px solid lightgray;padding-bottom: 5px "> </div>
+        <div style="margin-top: 15px">
         <div class="block block0">
             0
         </div>
@@ -290,14 +290,28 @@
             23
         </div>
         </div>
-        <p>请选择预测时间段</p>
+        <p style="padding-top: 5px;border-top: 1px solid lightgray;"><strong>请选择预测时间段</strong></p>
         <input type="text" class="hour_predict"/>
         <button id="submit_predict" class="btn">确定</button>
-        <p style="margin-top: 30px">请选择预测日期</p>
+        <p style="margin-top: 30px"><strong>请选择预测日期</strong></p>
         <input type="text" id="date_predict">
-        <br>
-        <br>
-        <div class="predict_people_count">
+        <p><strong>请选择预测达人类型</strong></p>
+        <div class="select">
+            <select name="" id="selectType_predict">
+                <option value=""></option>
+                <option value="1">购物达人</option>
+                <option value="2">交际达人</option>
+                <option value="3">游戏达人</option>
+                <option value="4">时政达人</option>
+                <option value="5">文娱达人</option>
+                <option value="6">IT达人</option>
+                <option value="7">健身达人</option>
+                <option value="8">旅游达人</option>
+                <option value="9">金融达人</option>
+                <option value="0">普通人</option>
+            </select>
+        </div>
+        <div class="predict_people_count" style="margin-top: 15px">
 
         </div>
     </div>

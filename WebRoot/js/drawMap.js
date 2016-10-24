@@ -66,9 +66,7 @@ $(document).ready(function() {
         showLabels: true,
         isRange : true
     });
-
-    $("#datePicker").AnyPicker(
-        {
+    $("#datePicker").AnyPicker({
             mode: "datetime",
             dateTimeFormat: "yyyy-MM-dd",
             minValue: new Date(2016, 02, 01),
@@ -86,8 +84,7 @@ $(document).ready(function() {
                     drawPointOrLine()
             }
         });
-    $("#date_predict").AnyPicker(
-        {
+    $("#date_predict").AnyPicker({
             mode: "datetime",
             dateTimeFormat: "yyyy-MM-dd",
             minValue: new Date(2016, 03, 01),
@@ -96,7 +93,13 @@ $(document).ready(function() {
             {
                 var date_predict =  document.getElementById('date_predict').value;
                 DATE_PREDICT = date_predict.split("-")[0]+date_predict.split("-")[1]+date_predict.split("-")[2];
-                getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+                var typeVal = $("#selectType_predict").find("option:selected").val();
+                if(typeVal!=""){
+                    getPredictServlet = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea+"&type="+typeVal;
+                }else {
+                    getPredictServlet ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+                }
+                //getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
                 getPredictServletFun();
             }
         });
@@ -116,11 +119,16 @@ $(document).ready(function() {
     var val =  $(".hour_predict").val();
         FROM_HOUR_PREDICT = val.split(",")[0];
         TO_HOUR_PREDICT = val.split(",")[1];
-        getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+        var typeVal = $("#selectType_predict").find("option:selected").val();
+        if(typeVal!=""){
+            getPredictServlet = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea+"&type="+typeVal;
+        }else {
+            getPredictServlet ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+        }
+        //getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
         getPredictServletFun();
 });
     $("#selectType").bind("change",function(){
-
         var typeVal = $("#selectType").find("option:selected").val();
         if(typeVal!=""){
             getStaticGridUrl = "/soda-web/getClassLineServlet?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea+"&classType="+typeVal;
@@ -128,6 +136,15 @@ $(document).ready(function() {
             getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
         }
         drawPointOrLine();
+    })
+    $("#selectType_predict").bind("change",function(){
+        var typeVal = $("#selectType_predict").find("option:selected").val();
+        if(typeVal!=""){
+            getPredictServlet = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea+"&type="+typeVal;
+        }else {
+            getPredictServlet ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+        }
+        getPredictServletFun();
     })
 });
 document.getElementById('datePicker').value = "2016-03-01";
@@ -171,7 +188,6 @@ function getPredictServletFun(){
         }
     })
 }
-
 $(".timePoint").val(FROM_HOUR+","+TO_HOUR);
 $(".hour_predict").val(FROM_HOUR+","+TO_HOUR);
 var echart ={
@@ -294,8 +310,8 @@ var echart ={
         myChart.setOption(option);
     }
 };
-    drawTipsLine();
-    function drawTipsLine(){
+drawTipsLine();
+function drawTipsLine(){
         appendSvg.selectAll(".rect").data(circleDataArr).enter()
             .append("rect")
             .attr("class","rect")
@@ -449,8 +465,8 @@ function  drawTipCircle(){
             return text;
         });
 }
-    drawMap();
-    function  drawMap(){
+drawMap();
+function  drawMap(){
     //绘制地图
     d3.json("../shanghai.json", function(error, root) {
         if (error)
@@ -589,7 +605,7 @@ function drawGrid(){
             .attr("fill","none");
     })
 }
-    function line(d){
+function line(d){
         var startCoordinate = getCoordinate(d.from_longitude, d.from_latitude);
         var endCoordinate = getCoordinate(d.to_longitude, d.to_latitude);
         var line = d3.svg.line()
