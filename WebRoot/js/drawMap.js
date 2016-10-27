@@ -95,9 +95,13 @@ $(document).ready(function() {
                 DATE_PREDICT = date_predict.split("-")[0]+date_predict.split("-")[1]+date_predict.split("-")[2];
                 var typeVal = $("#selectType_predict").find("option:selected").val();
                 if(typeVal!=""){
-                    getPredictServlet = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea+"&type="+typeVal;
+                    getPredictServlet_1 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=1&type="+typeVal;
+                    getPredictServlet_2 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=2&type="+typeVal;
+                    getPredictServlet_3 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3&type="+typeVal;
                 }else {
-                    getPredictServlet ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+                    getPredictServlet_1 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=1";
+                    getPredictServlet_2 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=2";
+                    getPredictServlet_3 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3";
                 }
                 //getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
                 getPredictServletFun();
@@ -121,9 +125,13 @@ $(document).ready(function() {
         TO_HOUR_PREDICT = val.split(",")[1];
         var typeVal = $("#selectType_predict").find("option:selected").val();
         if(typeVal!=""){
-            getPredictServlet = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea+"&type="+typeVal;
+            getPredictServlet_1 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=1&type="+typeVal;
+            getPredictServlet_2 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=2&type="+typeVal;
+            getPredictServlet_3 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3&type="+typeVal;
         }else {
-            getPredictServlet ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+            getPredictServlet_1 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=1";
+            getPredictServlet_2 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=2";
+            getPredictServlet_3 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3";
         }
         //getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
         getPredictServletFun();
@@ -140,9 +148,13 @@ $(document).ready(function() {
     $("#selectType_predict").bind("change",function(){
         var typeVal = $("#selectType_predict").find("option:selected").val();
         if(typeVal!=""){
-            getPredictServlet = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea+"&type="+typeVal;
+            getPredictServlet_1 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=1&type="+typeVal;
+            getPredictServlet_2 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=2&type="+typeVal;
+            getPredictServlet_3 = "/soda-web/getPredictManTypeServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3&type="+typeVal;
         }else {
-            getPredictServlet ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+            getPredictServlet_1 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=1";
+            getPredictServlet_2 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=2";
+            getPredictServlet_3 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3";
         }
         getPredictServletFun();
     })
@@ -161,11 +173,13 @@ var FROM_HOUR_PREDICT = HOUR_LAYOUT_STATIC_GRID;
 var TO_HOUR_PREDICT = HOUR_LAYOUT_STATIC_GRID;
 var tradingArea = 1;
 var getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;//获取静态点数据URL
-var getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+var getPredictServlet_1 = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=1";
+var getPredictServlet_2 = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=2";
+var getPredictServlet_3 = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3";
 getPredictServletFun();
 function getPredictServletFun(){
     $.ajax({
-        url:getPredictServlet,
+        url:getPredictServlet_1,
         type:"get",
         dataType:"json",
         async: false,
@@ -176,17 +190,45 @@ function getPredictServletFun(){
             }else {
                 htext = "从"+FROM_HOUR_PREDICT+"点到"+TO_HOUR_PREDICT+"点的预测人数为"+data.dataList[0].count+"人"
             }
-            if(tradingArea == 1){
-                address = "南京东路";
-            }else  if(tradingArea==2){
-                address = "徐家汇";
-            }else {
-                address = "莘庄";
-            }
+            address = "南京东路";
             text =  address+DATE_PREDICT+htext;
             $(".predict_people_count").text(text)
         }
-    })
+    });
+    $.ajax({
+        url:getPredictServlet_2,
+        type:"get",
+        dataType:"json",
+        async: false,
+        success:function(data){
+            var text = "",htext = "",address = "";
+            if(FROM_HOUR_PREDICT==TO_HOUR_PREDICT){
+                htext = "的"+FROM_HOUR_PREDICT+"点的预测人数为"+data.dataList[0].count+"人"
+            }else {
+                htext = "从"+FROM_HOUR_PREDICT+"点到"+TO_HOUR_PREDICT+"点的预测人数为"+data.dataList[0].count+"人"
+            }
+                address = "徐家汇";
+            text =  address+DATE_PREDICT+htext;
+            $(".predict_people_count_xujiahui").text(text)
+        }
+    });
+    $.ajax({
+        url:getPredictServlet_3,
+        type:"get",
+        dataType:"json",
+        async: false,
+        success:function(data){
+            var text = "",htext = "",address = "";
+            if(FROM_HOUR_PREDICT==TO_HOUR_PREDICT){
+                htext = "的"+FROM_HOUR_PREDICT+"点的预测人数为"+data.dataList[0].count+"人"
+            }else {
+                htext = "从"+FROM_HOUR_PREDICT+"点到"+TO_HOUR_PREDICT+"点的预测人数为"+data.dataList[0].count+"人"
+            }
+                address = "莘庄";
+            text =  address+DATE_PREDICT+htext;
+            $(".predict_people_count_xinzhuang").text(text)
+        }
+    });
 }
 $(".timePoint").val(FROM_HOUR+","+TO_HOUR);
 $(".hour_predict").val(FROM_HOUR+","+TO_HOUR);
@@ -344,9 +386,9 @@ function drawTipsLine(){
                     });
                     tradingArea = i+1;
                     getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
-                    getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
+                    //getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
                     drawPointOrLine();
-                    getPredictServletFun()
+                    //getPredictServletFun()
                 }
             });
 
