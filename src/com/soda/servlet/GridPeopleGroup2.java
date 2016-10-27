@@ -48,8 +48,10 @@ public class GridPeopleGroup2 extends BaseServlet {
 	        while(resultSet.next()){
 	    		JSONObject data=new JSONObject();
 	    		data.put("grid_people_group_id",groupId);
-	    		data.put("type",CenterData.centerDataMap.get(resultSet.getString("type")));
+	    		String type=resultSet.getString("type");
+	    		data.put("type",CenterData.centerDataMap.get(type));
 	        	data.put("count",resultSet.getString("count"));
+	        	data.put("IMEIS", this.queryImeis(groupId,type));
 	        	dataList.put(data);
 	        }
 			System.out.println(new Date()+" GridPeopleGroup2 dataList="+dataList.length());
@@ -62,6 +64,29 @@ public class GridPeopleGroup2 extends BaseServlet {
 			release(connection,pstmt,resultSet);
 		}
 		return json;
+	}
+	
+	private JSONArray queryImeis(String groupId,String type){
+		JSONArray imeis=new JSONArray();
+		Connection connection=null;
+		PreparedStatement pstmt=null;
+		ResultSet resultSet=null;
+		try{
+			connection=dataSource.getConnection();
+	        pstmt = connection.prepareStatement("SELECT imei FROM grid_imei_detail WHERE grid_people_group_id=? AND TYPE=? LIMIT 0,10");
+	        pstmt.setString(1, groupId);
+	        pstmt.setString(2, type);
+	        resultSet = pstmt.executeQuery();
+	        while(resultSet.next()){
+	        	imeis.put(resultSet.getString("imei"));
+	        }
+			System.out.println(new Date()+" queryImeis imeis="+imeis.length());
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			release(connection,pstmt,resultSet);
+		}
+		return imeis;
 	}
 	
 	
