@@ -95,11 +95,17 @@ public class GridFromToNum2 extends BaseServlet {
 	    		data.put("date",resultSet.getString("date"));
 	    		data.put("hour",resultSet.getString("hour"));
 	    		
-	    		Point fromPoint=GridDivide.indexMap.get(resultSet.getString("from_index"));
+	    		String from_index=resultSet.getString("from_index");
+	    		data.put("from_index", from_index);
+	    		
+	    		Point fromPoint=GridDivide.indexMap.get(from_index);
 	        	data.put("from_longitude",fromPoint.x);
 	        	data.put("from_latitude",fromPoint.y);
 	        	
-	        	Point toPoint=GridDivide.indexMap.get(resultSet.getString("to_index"));
+	        	String to_index=resultSet.getString("to_index");
+	    		data.put("to_index", to_index);
+	        	
+	        	Point toPoint=GridDivide.indexMap.get(to_index);
 	        	data.put("to_longitude",toPoint.x);
 	        	data.put("to_latitude",toPoint.y);
 	        	
