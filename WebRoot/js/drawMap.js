@@ -52,7 +52,7 @@ $(document).ready(function() {
         step: 1,
         scale: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
         format: '%s',
-        width: 400,
+        width: "80%",
         showLabels: true,
         isRange : true
     });
@@ -62,7 +62,7 @@ $(document).ready(function() {
         step: 1,
         scale: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
         format: '%s',
-        width: 400,
+        width: "80%",
         showLabels: true,
         isRange : true
     });
@@ -80,6 +80,7 @@ $(document).ready(function() {
                         getStaticGridUrl = "/soda-web/getClassLineServlet?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea+"&classType="+typeVal;
                     }else {
                         getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
+                        tableData();
                     }
                     drawPointOrLine()
             }
@@ -116,6 +117,7 @@ $(document).ready(function() {
         getStaticGridUrl = "/soda-web/getClassLineServlet?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea+"&classType="+typeVal;
     }else {
         getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
+        tableData()
     }
     drawPointOrLine()
 });
@@ -140,6 +142,7 @@ $(document).ready(function() {
         var typeVal = $("#selectType").find("option:selected").val();
         if(typeVal!=""){
             getStaticGridUrl = "/soda-web/getClassLineServlet?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea+"&classType="+typeVal;
+            tableData();
         }else {
             getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
         }
@@ -157,7 +160,7 @@ $(document).ready(function() {
             getPredictServlet_3 ="/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea=3";
         }
         getPredictServletFun();
-    })
+    });
 });
 document.getElementById('datePicker').value = "2016-03-01";
 document.getElementById('date_predict').value = "2016-04-01";
@@ -388,6 +391,9 @@ function drawTipsLine(){
                     getStaticGridUrl ="/soda-web/getGridFromToNum2?date="+DATE_LAYOUT_STATIC_GRID+"&fromHour="+FROM_HOUR+"&toHour="+TO_HOUR+"&tradingArea="+tradingArea;
                     //getPredictServlet = "/soda-web/getPredictServlet?date="+DATE_PREDICT+"&fromHour="+FROM_HOUR_PREDICT+"&toHour="+TO_HOUR_PREDICT+"&tradingArea="+tradingArea;
                     drawPointOrLine();
+                    if(FROM_HOUR!=TO_HOUR){
+                        tableData()
+                    }
                     //getPredictServletFun()
                 }
             });
@@ -926,6 +932,8 @@ function drawPointOrLine(){
             drawStatusPoint(drawPoint);
             drawStatusFlashingPoint(drawRect);
             drawRealLine(drawLine);
+
+
             //drawPredictionLine(drawLine)
         }
         echart.pie(root.graphData);
@@ -1105,7 +1113,36 @@ function drawStatusFlashingPoint(root){
         .duration(1000);
     staticGridExitCircle.remove();
 }
+function tableData(){
+    console.log(getStaticGridUrl)
+    $.ajax({
+        url:getStaticGridUrl,
+        type:"get",
+        dataType:"json",
+        async: false,
+        success:function(data){
+            var tr1 = $(".tr-1");
+            $(".table-tr").remove();
+            for(var i=0;i<data.dataList.length;i++){
+                tr1.after("<tr class='table-tr'><td>"+data.dataList[i].date+"</td><td>"+data.dataList[i].from_index+"</td><td>"+data.dataList[i].to_index+"</td><td>"+data.dataList[i].hour+"</td><td><a class='open-detail' id="+data.dataList[i].grid_people_group_id+">查看imei</a></td></tr>")
+            }
 
+            $(".open-detail").bind("click",function(){
+                var isType = false;
+                var str = getStaticGridUrl.split("=");
+                if(str.indexOf("/soda-web/getClassLineServlet?date")==0){
+                    isType=true;
+                }
+                var id =  $(this).attr("id");
+                if(isType){
+                    window.open("table.html?groupId="+id+"&type="+str[5]);
+                }else {
+                    window.open("table.html?groupId="+id);
+                }
+            })
+        }
+    });
+}
 
 
 
