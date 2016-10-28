@@ -235,6 +235,7 @@ function getPredictServletFun(){
 }
 $(".timePoint").val(FROM_HOUR+","+TO_HOUR);
 $(".hour_predict").val(FROM_HOUR+","+TO_HOUR);
+$(".table").css("display","none");
 var echart ={
     pie:  function (data){
         var myChart = echarts.init(document.getElementById('pie'));
@@ -393,6 +394,8 @@ function drawTipsLine(){
                     drawPointOrLine();
                     if(FROM_HOUR!=TO_HOUR){
                         tableData()
+                    }else{
+                        $(".table").css("display","none");
                     }
                     //getPredictServletFun()
                 }
@@ -845,6 +848,8 @@ function drawRealLine(root){
                 })
             }else {
                 $("#bar").css("display","none");
+                var typeVal = $("#selectType").find("option:selected").val();
+                window.open("table.html?groupId="+ d.grid_people_group_id+"&type="+typeVal);
             }
 
         })
@@ -898,7 +903,8 @@ function drawPointOrLine(){
             total = 0
         }
         if(FROM_HOUR==TO_HOUR){
-            htext = "的"+FROM_HOUR+"点的实际人数为"+total+"人"
+            htext = "的"+FROM_HOUR+"点的实际人数为"+total+"人";
+            $(".table").css("display","none");
         }else {
             htext = "从"+FROM_HOUR+"点到"+TO_HOUR+"点的实际人数为"+total+"人"
         }
@@ -1114,7 +1120,7 @@ function drawStatusFlashingPoint(root){
     staticGridExitCircle.remove();
 }
 function tableData(){
-    console.log(getStaticGridUrl)
+    $(".table").css("display","table");
     $.ajax({
         url:getStaticGridUrl,
         type:"get",

@@ -11,8 +11,6 @@ if(type){
 }else {
     url = "/soda-web/getGridPeopleGroup2?groupId="+groupId;
 }
-    console.log(groupId);
-    console.log(type);
     function GetParam(paramName) {
         var r = new RegExp(paramName + '=([^=&]+)', 'i');
         var mm = window.location.search.match(r);
