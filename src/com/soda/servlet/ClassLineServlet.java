@@ -81,7 +81,7 @@ public class ClassLineServlet extends BaseServlet {
 		ResultSet resultSet=null;
 		try{
 			connection=dataSource.getConnection();
-	        pstmt = connection.prepareStatement("SELECT t1.date,t1.hour,t1.from_index,t1.to_index,t2.type,t2.count FROM grid_from_to_num1 t1 JOIN grid_people_group1 t2 ON t1.grid_people_group_id=t2.grid_people_group_id WHERE t2.type=? AND t1.DATE=? AND t1.HOUR=? AND t1.COUNT>1000 AND t1.to_index!=(-1) AND t1.to_index!=t1.from_index AND t1.to_index "+queryWhereInByIndex(gridIndexs));
+	        pstmt = connection.prepareStatement("SELECT t1.date,t1.hour,t1.from_index,t1.to_index,t1.grid_people_group_id,t2.type,t2.count FROM grid_from_to_num1 t1 JOIN grid_people_group1 t2 ON t1.grid_people_group_id=t2.grid_people_group_id WHERE t2.type=? AND t1.DATE=? AND t1.HOUR=? AND t1.COUNT>1000 AND t1.to_index!=(-1) AND t1.to_index!=t1.from_index AND t1.to_index "+queryWhereInByIndex(gridIndexs));
 	        pstmt.setInt(1, classType);
 	        pstmt.setString(2, date);
 	        pstmt.setInt(3, currentHour);
@@ -115,6 +115,8 @@ public class ClassLineServlet extends BaseServlet {
 	        	data.put("to_latitude",toPoint.y);
 	        	
 	        	gridIndexs.add(resultSet.getInt("from_index"));
+	        	
+	        	data.put("grid_people_group_id",resultSet.getString("grid_people_group_id"));
 
 	        	data.put("count",resultSet.getString("count"));
 	        	data.put("type",resultSet.getString("type"));
